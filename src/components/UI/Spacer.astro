@@ -1,0 +1,42 @@
+---
+type Axis = "vertical" | "horizontal";
+
+interface Props {
+  size?: number | string;
+  axis?: Axis;
+  inline?: boolean;
+  class?: string;
+  style?: string;
+  ariaHidden?: boolean;
+}
+
+const {
+  size = "1rem",
+  axis = "vertical",
+  inline = false,
+  class: className = "",
+  style = "",
+  ariaHidden = true,
+  ...rest
+} = Astro.props as Props & Record<string, unknown>;
+
+const sizeValue = typeof size === "number" ? `${size}px` : size;
+
+const baseStyle = [
+  inline ? "display:inline-block;" : "display:block;",
+  axis === "horizontal"
+    ? `width:${sizeValue};height:1px;`
+    : `height:${sizeValue};width:100%;`,
+  "flex-shrink:0;",
+].join("");
+
+const mergedStyle = `${baseStyle}${style ? style : ""}`;
+---
+
+<span
+  class={className}
+  style={mergedStyle}
+  aria-hidden={ariaHidden}
+  role="presentation"
+  {...rest}
+></span>

@@ -1,0 +1,83 @@
+---
+import Spacer from "@components/UI/Spacer.astro";
+import styles from "./navbar.module.scss";
+import CtaButton from "@components/CTA/CtaButton.astro";
+
+const baseHref = import.meta.env.BASE_URL;
+const withTrailingSlash = (value) =>
+  value.endsWith("/") ? value : `${value}/`;
+const baseWithSlash = withTrailingSlash(baseHref);
+
+const resolveHref = (path) => {
+  if (path === "/" || path === "") {
+    return baseWithSlash;
+  }
+  const normalized = path.startsWith("/") ? path.slice(1) : path;
+  return `${baseWithSlash}${normalized}`;
+};
+
+const normalizeCurrentPath = (pathname) =>
+  pathname.startsWith(baseWithSlash)
+    ? pathname.slice(baseWithSlash.length - 1)
+    : pathname;
+
+const currentPath = normalizeCurrentPath(Astro.url.pathname);
+
+const baseMenu = [
+  { name: "Page 1", path: "/page-1" },
+  { name: "Page 2", path: "/page-2" },
+  { name: "Page 3", path: "/page-3" },
+];
+
+const menu = baseMenu.map((item) => {
+  const targetPath = item.path;
+  const href = resolveHref(targetPath);
+  const active =
+    targetPath === "/"
+      ? currentPath === "/"
+      : currentPath.startsWith(targetPath);
+  return {
+    ...item,
+    href,
+    active,
+  };
+});
+
+const menuLogo = {
+  url: `${baseWithSlash}images/company-logo.svg`,
+  alt: "Logo Mon Entreprise",
+};
+---
+
+<nav class={styles.navbar}>
+  <div class={styles.logo}>
+    <a href={resolveHref("/")}>
+      <img src={menuLogo.url} alt={menuLogo.alt} />
+    </a>
+  </div>
+  <input
+    type="checkbox"
+    id="burger"
+    class={styles.toggle}
+    aria-controls="menu-panel"
+  />
+  <label class={styles.burger} for="burger" aria-label="Basculer le menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </label>
+  <label for="burger" class={styles.overlay} aria-hidden="true"></label>
+  <div id="menu-panel" class={styles.menulist}>
+    <ul>
+      {
+        menu.map((item) => (
+          <li class={item.active ? styles.active : ""}>
+            <a href={item.href}>{item.name}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <Spacer size="3rem" axis="vertical" />
+    <CtaButton />
+  </div>
+</nav>

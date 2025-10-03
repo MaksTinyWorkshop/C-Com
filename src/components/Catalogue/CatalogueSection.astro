@@ -1,0 +1,286 @@
+---
+import { createMarkdownProcessor } from "@astrojs/markdown-remark";
+import { Tabs } from "webcoreui/astro";
+
+import styles from "./catalogue.module.scss";
+
+interface CatalogueLink {
+  label: string;
+  href: string;
+}
+
+interface CatalogueImage {
+  src: string;
+  alt?: string;
+}
+
+interface CatalogueItem {
+  title: string;
+  reference?: string;
+  description?: string;
+  price?: string;
+  image?: CatalogueImage;
+  cta?: CatalogueLink;
+}
+
+interface CatalogueCategory {
+  id: string;
+  label: string;
+  description?: string;
+  note?: string;
+  items: CatalogueItem[];
+}
+
+type ProcessedItem = CatalogueItem & {
+  descriptionHtml: string | null;
+  hasDetails: boolean;
+  detailsId: string;
+};
+
+type ProcessedCategory = CatalogueCategory & {
+  descriptionHtml: string | null;
+  noteHtml: string | null;
+  items: ProcessedItem[];
+};
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  categories?: CatalogueCategory[];
+  defaultCategory?: string;
+  footnote?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  intro,
+  categories = [],
+  defaultCategory,
+  footnote,
+} = Astro.props as Props;
+
+const baseHref = import.meta.env.BASE_URL;
+const withTrailingSlash = (value) =>
+  value.endsWith("/") ? value : `${value}/`;
+const baseWithSlash = withTrailingSlash(baseHref);
+const isExternal = (path) => /^(?:[a-z+]+:)?\/\//i.test(path);
+const resolveHref = (path) => {
+  if (!path || path === "") {
+    return baseWithSlash;
+  }
+  if (isExternal(path) || path.startsWith("#")) {
+    return path;
+  }
+  if (path === "/") {
+    return baseWithSlash;
+  }
+  const normalized = path.startsWith("/") ? path.slice(1) : path;
+  return `${baseWithSlash}${normalized}`;
+};
+const resolveAsset = (path) => {
+  if (!path || path === "") {
+    return path;
+  }
+  if (isExternal(path) || path.startsWith("data:")) {
+    return path;
+  }
+  if (path === "/") {
+    return baseWithSlash;
+  }
+  const normalized = path.startsWith("/") ? path.slice(1) : path;
+  return `${baseWithSlash}${normalized}`;
+};
+
+const validCategories = categories.filter(
+  (category) =>
+    category &&
+    category.id &&
+    Array.isArray(category.items) &&
+    category.items.length > 0
+);
+
+if (validCategories.length === 0) {
+  throw new Error(
+    "CatalogueSection nécessite au moins une catégorie contenant des produits."
+  );
+}
+
+const firstCategoryId = validCategories[0]?.id;
+const initialCategoryId =
+  validCategories.find((category) => category.id === defaultCategory)?.id ??
+  firstCategoryId;
+
+const markdownProcessor = await createMarkdownProcessor();
+
+const renderMarkdown = async (value?: string | null) => {
+  if (!value) return null;
+  const { code } = await markdownProcessor.render(value);
+  return code;
+};
+
+const processedCategories: ProcessedCategory[] = await Promise.all(
+  validCategories.map(async (category) => ({
+    ...category,
+    descriptionHtml: await renderMarkdown(category.description),
+    noteHtml: await renderMarkdown(category.note),
+    items: await Promise.all(
+      category.items.map(async (item, itemIndex) => {
+        const descriptionHtml = await renderMarkdown(item.description);
+        const hasDetails = Boolean(descriptionHtml || item.price || item.cta);
+        const resolvedImage = item.image
+          ? {
+              ...item.image,
+              src: resolveAsset(item.image.src),
+            }
+          : undefined;
+        const resolvedCta = item.cta
+          ? { ...item.cta, href: resolveHref(item.cta.href) }
+          : undefined;
+
+        return {
+          ...item,
+          descriptionHtml,
+          hasDetails,
+          detailsId: `${category.id}-item-${itemIndex}`,
+          image: resolvedImage,
+          cta: resolvedCta,
+        };
+      })
+    ),
+  }))
+);
+
+const introHtml = await renderMarkdown(intro);
+const footnoteHtml = await renderMarkdown(footnote);
+const tabItems = processedCategories.map((category) => ({
+  label: category.label,
+  value: category.id,
+  active: category.id === initialCategoryId,
+}));
+---
+
+<section class={`${styles.catalogue} section-container`}>
+  <div class={styles.catalogue__header}>
+    {eyebrow && <span class={styles.catalogue__eyebrow}>{eyebrow}</span>}
+    {title && <h2>{title}</h2>}
+    {introHtml && <div class={styles.catalogue__intro} set:html={introHtml} />}
+  </div>
+
+  <Tabs items={tabItems} even={true} className={styles.catalogue__tabs}>
+    {
+      processedCategories.map((category: ProcessedCategory) => {
+        const isActive = category.id === initialCategoryId;
+
+        return (
+          <section
+            data-tab={category.id}
+            data-active={isActive ? "true" : "false"}
+            class={`${styles.catalogue__panel} ${isActive ? "is-active" : ""}`}
+          >
+            {category.descriptionHtml && (
+              <div
+                class={styles.catalogue__panel_description}
+                set:html={category.descriptionHtml}
+              />
+            )}
+
+            <div class={styles.catalogue__items}>
+              {category.items.map((item: ProcessedItem) => (
+                <div class={styles.catalogue__cardWrapper}>
+                  <article
+                    class={styles.catalogue__card}
+                    data-card
+                    data-card-open="false"
+                  >
+                    <div class={styles.catalogue__card__inner}>
+                      {item.image && (
+                        <figure class={styles.catalogue__card__media}>
+                          <img
+                            src={item.image.src}
+                            alt={item.image.alt ?? ""}
+                            loading="lazy"
+                          />
+                        </figure>
+                      )}
+
+                      <div
+                        class={styles.catalogue__card__content}
+                        id={item.detailsId}
+                        data-card-details
+                        aria-hidden="true"
+                        hidden
+                      >
+                        <header class={styles.catalogue__card__header}>
+                          <h3>{item.title}</h3>
+                          {item.reference && (
+                            <p class={styles.catalogue__card__reference}>
+                              {item.reference}
+                            </p>
+                          )}
+                        </header>
+
+                        {item.descriptionHtml && (
+                          <div
+                            class={styles.catalogue__card__description}
+                            set:html={item.descriptionHtml}
+                          />
+                        )}
+
+                        {item.price && (
+                          <p class={styles.catalogue__card__price}>
+                            {item.price}
+                          </p>
+                        )}
+
+                        {item.cta && (
+                          <a
+                            class={styles.catalogue__card__cta}
+                            href={item.cta.href}
+                          >
+                            {item.cta.label}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+
+                  {item.hasDetails && (
+                    <button
+                      type="button"
+                      class={styles.catalogue__card__toggle}
+                      data-card-toggle
+                      data-card-target={item.detailsId}
+                      data-label-show="Details"
+                      data-label-hide="Masquer"
+                      aria-expanded="false"
+                      aria-controls={item.detailsId}
+                    >
+                      Détails
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {category.noteHtml && (
+              <div
+                class={styles.catalogue__note}
+                set:html={category.noteHtml}
+              />
+            )}
+          </section>
+        );
+      })
+    }
+  </Tabs>
+
+  {
+    footnoteHtml && (
+      <div class={styles.catalogue__footnote} set:html={footnoteHtml} />
+    )
+  }
+</section>
+
+<script src="./catalogue.client.ts"></script>

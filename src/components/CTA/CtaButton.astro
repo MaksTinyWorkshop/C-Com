@@ -1,0 +1,23 @@
+---
+import styles from "./ctaButton.module.scss";
+
+interface Props {
+  label?: string;
+}
+
+const { label = "ÊTRE RAPPELÉ" } = Astro.props as Props;
+---
+
+<div class={styles.container}>
+  <button class={styles.btnCta} type="button" data-callback-trigger>
+    <span class={styles.icon} aria-hidden="true">
+      <svg viewBox="0 0 24 24" role="img" focusable="false">
+        <path
+          fill="currentColor"
+          d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1-.26 11.36 11.36 0 0 0 3.56.57 1 1 0 0 1 1 1v3.57a1 1 0 0 1-1 1 17 17 0 0 1-17-17 1 1 0 0 1 1-1H7a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.56 1 1 0 0 1-.26 1z"
+        ></path>
+      </svg>
+    </span>
+    {label}
+  </button>
+</div>

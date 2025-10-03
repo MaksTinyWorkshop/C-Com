@@ -1,0 +1,57 @@
+---
+interface Props {
+  title?: string;
+  caption?: string;
+  embedUrl: string;
+}
+
+const { title, caption, embedUrl } = Astro.props as Props;
+---
+
+<section class="section-container map-section">
+  {title && <h3>{title}</h3>}
+  <div class="map-wrapper">
+    <iframe
+      title={caption ?? title ?? "Localisation Envolet'toit"}
+      src={embedUrl}
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen></iframe>
+  </div>
+  {caption && <p class="map-caption">{caption}</p>}
+</section>
+
+<style lang="scss">
+  .map-section {
+    text-align: center;
+
+    h3 {
+      margin: var(--space-2) 0;
+    }
+  }
+
+  .map-wrapper {
+    position: relative;
+    width: min(300px, 100%);
+    aspect-ratio: 1 / 1;
+    border-radius: 15px;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(20, 20, 20, 0.12);
+  }
+
+  .map-wrapper iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .map-caption {
+    font-size: var(--step-0);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    white-space: pre-line;
+  }
+</style>

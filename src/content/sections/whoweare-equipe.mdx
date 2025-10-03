@@ -1,0 +1,41 @@
+---
+component: markdown
+title: "L'equipe"
+description: "team"
+---
+
+export const baseHref = import.meta.env.BASE_URL;
+export const withTrailingSlash = (value) =>
+  value.endsWith("/") ? value : `${value}/`;
+export const baseWithSlash = withTrailingSlash(baseHref);
+export const resolveAsset = (path) => {
+  if (!path || path === "") {
+    return path;
+  }
+  if (/^(?:[a-z+]+:)?\/\//i.test(path) || path.startsWith("data:")) {
+    return path;
+  }
+  if (path === "/") {
+    return baseWithSlash;
+  }
+  const normalized = path.startsWith("/") ? path.slice(1) : path;
+  return `${baseWithSlash}${normalized}`;
+};
+
+<img src={resolveAsset("/images/gallery/Seb.png")} alt="Photodu CEO" />
+
+#### Sébastien
+
+CEO
+
+![Technicien](https://placehold.co/400x400/ededed/777?text=Technicien)
+
+#### Bob
+
+Technicien
+
+![Poste à pourvoir](https://placehold.co/400x400/ededed/777?text=Poste+à+pourvoir)
+
+#### Peut-être vous ?
+
+Poste à pourvoir

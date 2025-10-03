@@ -1,0 +1,16 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getEntry } from "astro:content";
+import { resolveSection } from "@lib/sectionRenderer";
+
+const page = await getEntry("pages", "home");
+const sections = await Promise.all(
+  page.data.sections.map(async ({ slug }) => await getEntry("sections", slug))
+);
+
+const resolvedSections = await Promise.all(sections.map(resolveSection));
+---
+
+<BaseLayout title={page.data.title} description={page.data.description}>
+  {resolvedSections.map(({ Component, props }) => <Component {...props} />)}
+</BaseLayout>

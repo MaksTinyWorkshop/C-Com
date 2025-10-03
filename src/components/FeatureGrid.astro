@@ -1,0 +1,97 @@
+---
+import Icon from "@components/Icons/Icon.astro";
+import Spacer from "@components/UI/Spacer.astro";
+
+interface FeatureItem {
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  features: FeatureItem[];
+}
+
+const { eyebrow, title, description, features } = Astro.props as Props;
+---
+
+<section class="section-container">
+  <div class="intro">
+    {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+    <h2>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+  <div class="features">
+    {
+      features.map((feature) => (
+        <article class="feature">
+          <div class="feature__icon">
+            {feature.icon ? (
+              <Icon type={feature.icon as any} />
+            ) : (
+              <span aria-hidden="true" class="feature__fallback">
+                •
+              </span>
+            )}
+          </div>
+          <h3>{feature.title}</h3>
+          <p>{feature.description}</p>
+        </article>
+      ))
+    }
+  </div>
+  <Spacer size="2rem" />
+</section>
+
+<style>
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.25rem;
+    max-width: 420px;
+  }
+
+  .feature__icon {
+    width: var(--space-6);
+    height: var(--space-6);
+    background: var(--color-base-content);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  .feature__icon :global(svg) {
+    width: var(--space-5);
+    height: var(--space-5);
+    fill: var(--color-primary);
+  }
+
+  .feature__fallback {
+    font-size: var(--step-2);
+    color: var(--color-primary);
+  }
+
+  .feature h3 {
+    margin: 0;
+    font-size: var(--step-1);
+  }
+
+  .feature p {
+    margin: 0;
+    color: var(--color-neutral-content);
+    line-height: 1.6;
+  }
+</style>

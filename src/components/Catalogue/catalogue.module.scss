@@ -1,0 +1,291 @@
+.catalogue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+
+  &__header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    h2 {
+      font-size: var(--step-4);
+      margin: 0;
+    }
+  }
+
+  &__eyebrow {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  &__intro {
+    :global(p) {
+      margin: 0;
+      color: var(--color-neutral-content, #555);
+    }
+  }
+
+  &__tabs {
+    width: 100%;
+
+    > :global(div:first-child) {
+      overflow-x: auto;
+
+      > :global(div) {
+        display: flex;
+        flex-wrap: nowrap;
+        border: 0 !important;
+        padding: 0;
+        background: #000;
+        width: 100%;
+      }
+    }
+
+    :global(button) {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--color-primary) !important;
+      font-size: var(--step--1);
+      font-family: Bold, 'Montserrat', sans-serif;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      flex: 1;
+      padding: var(--space-2);
+    }
+
+    :global(button[data-active='true']) {
+      background: var(--color-primary);
+      color: var(--color-base-100) !important;
+      border-bottom: none !important;
+    }
+
+    :global([data-tab][data-active='true']) {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    @media (max-width: 720px) {
+      > :global(div:first-child) {
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+          height: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 999px;
+        }
+      }
+    }
+  }
+
+  &__panel_description {
+    :global(p) {
+      margin: 0 0 var(--space-3);
+      color: var(--color-neutral-content, #555);
+      text-align: center;
+    }
+  }
+
+  &__panel {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  &__items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-3);
+  }
+
+  &__cardWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    align-items: stretch;
+  }
+
+  &__card {
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 1rem;
+    overflow: hidden;
+    background: var(--color-base-100);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 90%;
+    margin: 0 auto;
+    perspective: 1000px;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    &[data-card-open='true'] {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-lg);
+    }
+
+    &[data-card-open='true'] &__media {
+      transform: scale(0.92);
+    }
+
+    &[data-card-open='true'] &__media img {
+      transform: scale(1.08);
+    }
+
+    &[data-card-open='true'] &__content {
+      transform: rotateX(0deg);
+      pointer-events: auto;
+    }
+
+    &__inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+
+    &__media {
+      margin: 0;
+      background: var(--color-base-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2);
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+      img {
+        max-width: 100%;
+        height: auto;
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+    }
+
+    &__content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: var(--space-3);
+      background: var(--color-base-100);
+      box-sizing: border-box;
+      transform: rotateX(-90deg);
+      transform-origin: bottom;
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      backface-visibility: hidden;
+    }
+
+    &__header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+    }
+
+    &__reference {
+      margin: 0;
+      font-size: var(--step--1);
+      color: var(--color-neutral-content, #555);
+    }
+
+    &__description {
+      :global(p) {
+        margin: 0;
+        line-height: 1.5;
+        color: var(--color-neutral-content, #555);
+      }
+    }
+
+    &__price {
+      font-size: var(--step-0);
+      font-weight: 700;
+      margin: auto 0 0;
+      color: #111;
+    }
+
+    &__cta {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-1) var(--space-2);
+      background: var(--color-primary);
+      color: var(--color-base-100);
+      font-family: Bold, 'Montserrat', sans-serif;
+      font-size: var(--step--1);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      transition: transform 0.2s ease, background 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        background: var(--color-primary);
+      }
+    }
+
+  }
+
+  &__card__toggle {
+    align-self: center;
+    margin-top: var(--space-1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-base-100);
+    color: var(--color-primary);
+    font-family: Bold, 'Montserrat', sans-serif;
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      outline: none;
+      background: var(--color-primary);
+      color: var(--color-base-100) !important;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--color-primary-transparent);
+    }
+  }
+
+  &__note {
+    :global(p) {
+      margin: 1.5rem 0 0;
+      color: var(--color-neutral-content, #555);
+      text-align: center;
+    }
+  }
+
+  &__footnote {
+    text-align: center;
+    color: var(--color-neutral-content, #555);
+    font-size: 0.9rem;
+
+    :global(p) {
+      margin: 0;
+    }
+  }
+}

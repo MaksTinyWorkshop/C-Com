@@ -1,0 +1,94 @@
+:root {
+  /*Variables nommées comme DaisyUI*/
+  --color-base-100: #f5f5f5; /* rgb(245, 245, 245) */
+  --color-base-200: #E1F5F6; /* rgb(225, 245, 246) */
+  --color-base-300: #E4F3FE; /* rgb(228, 243, 254) */
+  --color-base-content: #040404; /* rgb(0, 2, 6) */
+
+  --color-primary: #002AFF; /* rgb(0, 42, 255) */
+  --color-primary-transparent: rgba(0, 42, 255, 0.5);
+  --color-primary-content: #E4F3FE; /* rgb(228, 243, 254) */
+
+  --color-secondary: #008FB4; /* rgb(0, 143, 180) */
+  --color-secondary-content: #E1F5F6; /* rgb(225, 245, 246) */
+
+  --color-accent: #007B17; /* rgb(0, 123, 23) */
+  --color-accent-content: #E5F5EB; /* rgb(229, 245, 235) */
+
+  --color-neutral: #FAF4F4; /* rgb(250, 244, 244) */
+  --color-neutral-content: rgba(4, 4, 4, 0.6);
+
+  --color-info: #0078E4; /* rgb(0, 120, 228) */
+  --color-info-content: #E1F4FB; /* rgb(225, 244, 251) */
+
+  --color-success: #006E00; /* rgb(0, 110, 0) */
+  --color-success-content: #E9F4E6; /* rgb(233, 244, 230) */
+
+  --color-warning: #FF5D00; /* rgb(255, 93, 0) */
+  --color-warning-content: #040200; /* rgb(4, 2, 0) */
+
+  --color-error: #FF0000; /* rgb(255, 0, 0) */
+  --color-error-content: #FFEBE8; /* rgb(255, 235, 232) */
+  
+  --radius-selector: 0rem;
+  --radius-field: 0rem;
+  --radius-box: 0rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+
+  /* Variables de taille texte Responsive */
+  --step--2: clamp(0.75rem, 0.5vw, 0.875rem);   /* petit texte */
+  --step--1: clamp(0.875rem, 0.75vw, 1rem);     /* texte secondaire */
+  --step-0: clamp(1rem, 1vw, 1.125rem);         /* texte normal (base) */
+  --step-1: clamp(1.25rem, 1.5vw, 1.5rem);      /* h4, sous-titres */
+  --step-2: clamp(1.5rem, 2vw, 2rem);           /* h3 */
+  --step-3: clamp(2rem, 3vw, 2.5rem);           /* h2 */
+  --step-4: clamp(2.5rem, 4vw, 3rem);           /* h1 */
+  --step-5: clamp(2.5rem, 5vw, 4rem);           /* hero title */
+  
+  /* Variables d'espacement Padding | Margin */
+  --space-1: clamp(0.5rem, 1vw, 1rem);          /* 8–16px */
+  --space-2: clamp(1rem, 2vw, 1.5rem);          /* 16–24px */
+  --space-3: clamp(1.5rem, 3vw, 2.5rem);        /* 24–40px */
+  --space-4: clamp(2rem, 4vw, 3rem);            /* 32–48px */
+  --space-5: clamp(3rem, 6vw, 4rem);            /* 48–64px */
+  --space-6: clamp(4rem, 8vw, 8rem);            /* 64–96px */
+  
+  /* Variables d'ombrage */
+  --shadow-2xs: 0 1px rgb(0 0 0 / 0.05); 
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* Variables de radius */
+  --radius-xs: 0.125rem;    /* 2px */
+  --radius-sm: 0.25rem;     /* 4px */
+  --radius-md: 0.375rem;    /* 6px */
+  --radius-lg: 0.5rem;      /* 8px */
+  --radius-xl: 0.75rem;     /* 12px */
+  --radius-2xl: 1rem;       /* 16px */
+  --radius-3xl: 1.5rem;     /* 24px */
+  --radius-4xl: 2rem;       /* 32px */
+  --radius-full: 9999px;
+}
+
+.intro {
+    max-width: 480px;
+    margin: var(--space-5) auto;
+    text-align: center;
+
+    h2 {
+      font-size: var(--step-3);
+      font-family: var(fontBold);
+    }
+
+    p {
+        color: var(--color-neutral-content);
+    }
+  }

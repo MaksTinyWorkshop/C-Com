@@ -1,0 +1,252 @@
+---
+interface Step {
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+type Props = {
+  title: string;
+  schema?: string;
+  description?: string;
+  steps: Step[];
+};
+
+const baseHref = import.meta.env.BASE_URL;
+const withTrailingSlash = (value) =>
+  value.endsWith("/") ? value : `${value}/`;
+const baseWithSlash = withTrailingSlash(baseHref);
+const isExternal = (path) => /^(?:[a-z+]+:)?\/\//i.test(path);
+const resolveUrl = (path) => {
+  if (!path || path === "") {
+    return undefined;
+  }
+  if (isExternal(path) || path.startsWith("#")) {
+    return path;
+  }
+  if (path === "/") {
+    return baseWithSlash;
+  }
+  const normalized = path.startsWith("/") ? path.slice(1) : path;
+  return `${baseWithSlash}${normalized}`;
+};
+
+const { title, description, schema, steps } = Astro.props as Props;
+const resolvedSchema = resolveUrl(schema);
+const hasSchema = Boolean(resolvedSchema);
+---
+
+<section class="section-container parcours">
+  <div class="intro">
+    <h2>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+  <ol
+    class={`timeline ${hasSchema ? "timeline--schema" : ""}`}
+    role="list"
+    style={hasSchema ? `--timeline-schema:url(${resolvedSchema});` : undefined}
+  >
+    {
+      steps.map((step, index) => {
+        const stepNumber = index + 1;
+        const alignmentClass =
+          index % 2 === 0 ? "timeline__step--left" : "timeline__step--right";
+        const positionClass = `timeline__step--position-${stepNumber}`;
+        return (
+          <li class={`timeline__step ${alignmentClass} ${positionClass}`}>
+            <div class="timeline__order" aria-hidden="true" />
+            <div class="timeline__content">
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ol>
+</section>
+
+<style>
+  .parcours {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .timeline {
+    list-style: none;
+    margin: 0 0;
+    padding: 0 0;
+    position: relative;
+    display: grid;
+    gap: clamp(2.75rem, 7vw, 4rem);
+  }
+
+  .timeline:not(.timeline--schema) {
+    justify-items: stretch;
+  }
+
+  .timeline:not(.timeline--schema) .timeline__step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .timeline--schema {
+    position: relative;
+    width: min(440px, 90vw);
+    aspect-ratio: 179 / 436;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    column-gap: clamp(1.25rem, 4vw, 3rem);
+    row-gap: clamp(1.6rem, 5vw, 2.8rem);
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+    padding-block: clamp(2.25rem, 6.5vw, 3.25rem);
+  }
+
+  .timeline--schema::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 95%;
+    height: 95%;
+    background-image: var(--timeline-schema);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .timeline--schema .timeline__step {
+    position: relative;
+    display: contents;
+  }
+
+  .timeline--schema .timeline__step--left .timeline__order {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: center;
+    align-self: center;
+  }
+
+  .timeline--schema .timeline__step--left .timeline__content {
+    grid-column: 2;
+    align-self: center;
+    text-align: left;
+    margin-left: clamp(0.75rem, 3vw, 1.5rem);
+  }
+
+  .timeline--schema .timeline__step--right .timeline__content {
+    grid-column: 1;
+    align-self: center;
+    text-align: right;
+    margin-right: clamp(0.75rem, 3vw, 1.5rem);
+  }
+
+  .timeline--schema .timeline__step--position-1 .timeline__order,
+  .timeline--schema .timeline__step--position-1 .timeline__content {
+    grid-row: 1;
+  }
+
+  .timeline--schema .timeline__step--position-2 .timeline__order,
+  .timeline--schema .timeline__step--position-2 .timeline__content {
+    grid-row: 2;
+  }
+
+  .timeline--schema .timeline__step--position-3 .timeline__order,
+  .timeline--schema .timeline__step--position-3 .timeline__content {
+    grid-row: 3;
+  }
+
+  .timeline--schema .timeline__step--position-4 .timeline__order,
+  .timeline--schema .timeline__step--position-4 .timeline__content {
+    grid-row: 4;
+  }
+
+  .timeline__order {
+    width: clamp(2rem, 6vw, 2.75rem);
+    height: clamp(2rem, 6vw, 2.75rem);
+    border-radius: 999px;
+    margin: 0 auto;
+    opacity: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .timeline__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: left;
+    max-width: clamp(220px, 45vw, 280px);
+    position: relative;
+    z-index: 1;
+  }
+
+  .timeline__content h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    font-family: "Kameron", "Montserrat", system-ui, sans-serif;
+  }
+
+  .timeline__content p {
+    margin: 0;
+    color: var(--color-neutral-content);
+    line-height: 1.6;
+  }
+
+  .timeline__connector {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+    .timeline {
+      padding: 0 0;
+      margin: 0 0;
+    }
+
+    ol {
+      padding: 0;
+    }
+
+    .timeline--schema {
+      width: min(360px, 95vw);
+      column-gap: clamp(0.75rem, 4vw, 1.75rem);
+      row-gap: clamp(1.25rem, 5vw, 2rem);
+    }
+
+    .timeline--schema::before {
+      width: 82%;
+      height: 82%;
+      background-position: center top;
+      background-size: contain;
+    }
+
+    .timeline--schema .timeline__step {
+      display: contents;
+    }
+
+    .timeline--schema .timeline__content {
+      max-width: clamp(150px, 45vw, 200px);
+      text-align: left;
+      margin: 0;
+    }
+
+    .timeline--schema .timeline__step--right .timeline__content {
+      text-align: right;
+    }
+
+    .timeline__content h3 {
+      font-size: clamp(0.8rem, 4.2vw, 1.2rem);
+    }
+
+    .timeline__content p {
+      font-size: clamp(0.4rem, 3.1vw, 1rem);
+    }
+  }
+</style>

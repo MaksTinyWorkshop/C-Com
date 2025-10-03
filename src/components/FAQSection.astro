@@ -1,0 +1,57 @@
+---
+interface Question {
+  question: string;
+  answer: string;
+  role?: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  questions: Question[];
+}
+
+const { title, description, questions } = Astro.props as Props;
+import { Accordion } from "webcoreui/astro";
+import Spacer from "./UI/Spacer.astro";
+---
+
+<section class="section-container questions">
+  <div class="intro">
+    <h2>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+  <Accordion
+    items={questions.map(({ question, answer }) => ({
+      title: question,
+      content: answer,
+    }))}
+    className="faq-accordion"
+  />
+
+  <Spacer size="2rem" />
+</section>
+
+<style>
+  .faq-accordion {
+    max-width: 90vw;
+    margin: 0 auto;
+
+    button {
+      font-family: var(fontBold);
+      font-size: var(--step-0);
+      font-weight: 600;
+    }
+
+    li {
+      font-family: var(fontRegular);
+      font-size: var(--step-0);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .faq-accordion {
+      max-width: 600px;
+    }
+  }
+</style>
