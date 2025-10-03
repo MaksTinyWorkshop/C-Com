@@ -10,8 +10,8 @@ export default defineConfig({
   scopedStyleStrategy: 'where',
   integrations: [tailwind(), mdx(), webcore()],
   // Rajout de ces deux lignes pour GithubPages
-  output: 'static',
-  base: '/Nom_du_Repo',
+  //output: 'static',
+  //base: '/Nom_du_Repo',
   //
   markdown: {
     syntaxHighlight: 'prism',

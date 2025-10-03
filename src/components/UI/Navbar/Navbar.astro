@@ -2,6 +2,8 @@
 import Spacer from "@components/UI/Spacer.astro";
 import styles from "./navbar.module.scss";
 import CtaButton from "@components/CTA/CtaButton.astro";
+import Icon from "@components/Icons/Icon.astro";
+import { mainNavigation, companyDetails } from "@lib/siteData";
 
 const baseHref = import.meta.env.BASE_URL;
 const withTrailingSlash = (value) =>
@@ -23,13 +25,30 @@ const normalizeCurrentPath = (pathname) =>
 
 const currentPath = normalizeCurrentPath(Astro.url.pathname);
 
-const baseMenu = [
-  { name: "Page 1", path: "/page-1" },
-  { name: "Page 2", path: "/page-2" },
-  { name: "Page 3", path: "/page-3" },
-];
+const resolveAsset = (path) => {
+  if (!path) {
+    return "";
+  }
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+  const normalized = path.startsWith("/") ? path.slice(1) : path;
+  return `${baseWithSlash}${normalized}`;
+};
 
-const menu = baseMenu.map((item) => {
+const contactItems = companyDetails.contactItems ?? [];
+const logoAsset = (() => {
+  const primaryLogo = companyDetails.logos?.[0];
+  if (!primaryLogo) {
+    return { url: "", alt: "" };
+  }
+  return {
+    ...primaryLogo,
+    url: resolveAsset(primaryLogo.source.src),
+  };
+})();
+
+const menu = mainNavigation.map((item) => {
   const targetPath = item.path;
   const href = resolveHref(targetPath);
   const active =
@@ -42,42 +61,62 @@ const menu = baseMenu.map((item) => {
     active,
   };
 });
-
-const menuLogo = {
-  url: `${baseWithSlash}images/company-logo.svg`,
-  alt: "Logo Mon Entreprise",
-};
 ---
 
-<nav class={styles.navbar}>
-  <div class={styles.logo}>
-    <a href={resolveHref("/")}>
-      <img src={menuLogo.url} alt={menuLogo.alt} />
-    </a>
+<nav>
+  <div class={styles.navbar}>
+    <Spacer size="30px" axis="horizontal" />
+    <div class={styles.logo}>
+      <a href={resolveHref("/")}>
+        {
+          logoAsset.url && (
+            <img src={logoAsset.url} alt={logoAsset.alt ?? "Logo"} />
+          )
+        }
+      </a>
+    </div>
+    <input
+      type="checkbox"
+      id="burger"
+      class={styles.toggle}
+      aria-controls="menu-panel"
+    />
+    <label class={styles.burger} for="burger" aria-label="Basculer le menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+    <label for="burger" class={styles.overlay} aria-hidden="true"></label>
+    <div id="menu-panel" class={styles.menulist}>
+      <ul>
+        {
+          menu.map((item) => (
+            <li class={item.active ? styles.active : ""}>
+              <a href={item.href}>{item.name}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <Spacer size="3rem" axis="vertical" />
+      <CtaButton />
+    </div>
   </div>
-  <input
-    type="checkbox"
-    id="burger"
-    class={styles.toggle}
-    aria-controls="menu-panel"
-  />
-  <label class={styles.burger} for="burger" aria-label="Basculer le menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </label>
-  <label for="burger" class={styles.overlay} aria-hidden="true"></label>
-  <div id="menu-panel" class={styles.menulist}>
-    <ul>
-      {
-        menu.map((item) => (
-          <li class={item.active ? styles.active : ""}>
-            <a href={item.href}>{item.name}</a>
-          </li>
-        ))
-      }
-    </ul>
-    <Spacer size="3rem" axis="vertical" />
-    <CtaButton />
-  </div>
+  {
+    contactItems.length > 0 && (
+      <div class={styles.contact_panel}>
+        {contactItems.map((item) => (
+          <a
+            class={styles.contact_item}
+            href={item.href}
+            aria-label={item.label}
+          >
+            <span class={styles.contact_icon}>
+              <Icon type={item.icon} color="var(--color-neutral)" />
+            </span>
+            <span class={styles.contact_label}>{item.label}</span>
+          </a>
+        ))}
+      </div>
+    )
+  }
 </nav>
