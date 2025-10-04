@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { resolveUrl } from "@lib/urlHelpers";
+import Spacer from "@components/UI/Spacer.astro";
+import styles from "./markdownSection.module.scss";
+
+type MarkdownRender = Awaited<
+  ReturnType<CollectionEntry<"sections">["render"]>
+>;
+
+interface Images {
+  src: string;
+  alt?: string;
+  caption?: string;
+}
+interface Props {
+  title?: string;
+  description?: string;
+  images?: Images[];
+  variant?: string;
+  Content: MarkdownRender["Content"];
+}
+
+const {
+  title,
+  description,
+  images,
+  variant = "",
+  Content,
+} = Astro.props as Props;
+
+const sectionClass = [
+  "section-container",
+  styles.markdown,
+  variant ? styles[`markdown--${variant}`] ?? "" : "",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const resolvedImages = images?.map((image) => ({
+  ...image,
+  src: resolveUrl(image.src),
+}));
+---
+
+<section class={sectionClass}>
+  {variant && <Spacer size="3rem" axis="vertical" />}
+
+  {
+    resolvedImages && resolvedImages.length > 0 && (
+      <div class={styles.imageGallery ?? "image-gallery"}>
+        {resolvedImages.map((image) => (
+          <figure>
+            <img src={image.src} alt={image.alt ?? ""} />
+            {image.caption && <figcaption>{image.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    )
+  }
+  {title && <h2>{title}</h2>}
+
+  <div class={styles.prose}>
+    <Content />
+  </div>
+</section>

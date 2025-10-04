@@ -1,4 +1,7 @@
 ---
+import Icon from "./Icons/Icon.astro";
+import Spacer from "./UI/Spacer.astro";
+
 interface Step {
   title: string;
   description: string;
@@ -7,246 +10,203 @@ interface Step {
 
 type Props = {
   title: string;
-  schema?: string;
   description?: string;
   steps: Step[];
 };
 
-const baseHref = import.meta.env.BASE_URL;
-const withTrailingSlash = (value) =>
-  value.endsWith("/") ? value : `${value}/`;
-const baseWithSlash = withTrailingSlash(baseHref);
-const isExternal = (path) => /^(?:[a-z+]+:)?\/\//i.test(path);
-const resolveUrl = (path) => {
-  if (!path || path === "") {
-    return undefined;
-  }
-  if (isExternal(path) || path.startsWith("#")) {
-    return path;
-  }
-  if (path === "/") {
-    return baseWithSlash;
-  }
-  const normalized = path.startsWith("/") ? path.slice(1) : path;
-  return `${baseWithSlash}${normalized}`;
-};
-
-const { title, description, schema, steps } = Astro.props as Props;
-const resolvedSchema = resolveUrl(schema);
-const hasSchema = Boolean(resolvedSchema);
+const { title, description, steps } = Astro.props as Props;
 ---
 
 <section class="section-container parcours">
-  <div class="intro">
+  <Spacer size="6rem" axis="vertical" />
+  <div class="chiffres">
     <h2>{title}</h2>
-    {description && <p>{description}</p>}
+    {description && <p set:html={description} />}
   </div>
-  <ol
-    class={`timeline ${hasSchema ? "timeline--schema" : ""}`}
-    role="list"
-    style={hasSchema ? `--timeline-schema:url(${resolvedSchema});` : undefined}
-  >
+  <ol class="parcours__list">
     {
-      steps.map((step, index) => {
-        const stepNumber = index + 1;
-        const alignmentClass =
-          index % 2 === 0 ? "timeline__step--left" : "timeline__step--right";
-        const positionClass = `timeline__step--position-${stepNumber}`;
-        return (
-          <li class={`timeline__step ${alignmentClass} ${positionClass}`}>
-            <div class="timeline__order" aria-hidden="true" />
-            <div class="timeline__content">
-              <h3>{step.title}</h3>
+      steps.map((step, index) => (
+        <li class="parcours__item">
+          <div class="parcours__itemInner">
+            {step.icon && (
+              <div class="icon" aria-hidden="true">
+                <Icon type={step.icon} size={18} color="var(--color-primary)" />
+              </div>
+            )}
+            <article class="parcours__card">
+              <h3>
+                <span class="parcours__step">Étape {index + 1} -</span>
+                {step.title}
+              </h3>
               <p>{step.description}</p>
-            </div>
-          </li>
-        );
-      })
+            </article>
+          </div>
+        </li>
+      ))
     }
   </ol>
+  <Spacer size="6rem" axis="vertical" />
 </section>
 
-<style>
+<style lang="scss">
   .parcours {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
-  }
+    background-color: #fff;
 
-  .timeline {
-    list-style: none;
-    margin: 0 0;
-    padding: 0 0;
-    position: relative;
-    display: grid;
-    gap: clamp(2.75rem, 7vw, 4rem);
-  }
-
-  .timeline:not(.timeline--schema) {
-    justify-items: stretch;
-  }
-
-  .timeline:not(.timeline--schema) .timeline__step {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .timeline--schema {
-    position: relative;
-    width: min(440px, 90vw);
-    aspect-ratio: 179 / 436;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(0, 1fr));
-    column-gap: clamp(1.25rem, 4vw, 3rem);
-    row-gap: clamp(1.6rem, 5vw, 2.8rem);
-    padding-inline: clamp(1rem, 4vw, 2.5rem);
-    padding-block: clamp(2.25rem, 6.5vw, 3.25rem);
-  }
-
-  .timeline--schema::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 95%;
-    height: 95%;
-    background-image: var(--timeline-schema);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .timeline--schema .timeline__step {
-    position: relative;
-    display: contents;
-  }
-
-  .timeline--schema .timeline__step--left .timeline__order {
-    grid-column: 1;
-    grid-row: auto;
-    justify-self: center;
-    align-self: center;
-  }
-
-  .timeline--schema .timeline__step--left .timeline__content {
-    grid-column: 2;
-    align-self: center;
-    text-align: left;
-    margin-left: clamp(0.75rem, 3vw, 1.5rem);
-  }
-
-  .timeline--schema .timeline__step--right .timeline__content {
-    grid-column: 1;
-    align-self: center;
-    text-align: right;
-    margin-right: clamp(0.75rem, 3vw, 1.5rem);
-  }
-
-  .timeline--schema .timeline__step--position-1 .timeline__order,
-  .timeline--schema .timeline__step--position-1 .timeline__content {
-    grid-row: 1;
-  }
-
-  .timeline--schema .timeline__step--position-2 .timeline__order,
-  .timeline--schema .timeline__step--position-2 .timeline__content {
-    grid-row: 2;
-  }
-
-  .timeline--schema .timeline__step--position-3 .timeline__order,
-  .timeline--schema .timeline__step--position-3 .timeline__content {
-    grid-row: 3;
-  }
-
-  .timeline--schema .timeline__step--position-4 .timeline__order,
-  .timeline--schema .timeline__step--position-4 .timeline__content {
-    grid-row: 4;
-  }
-
-  .timeline__order {
-    width: clamp(2rem, 6vw, 2.75rem);
-    height: clamp(2rem, 6vw, 2.75rem);
-    border-radius: 999px;
-    margin: 0 auto;
-    opacity: 0;
-    position: relative;
-    z-index: 1;
-  }
-
-  .timeline__content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: left;
-    max-width: clamp(220px, 45vw, 280px);
-    position: relative;
-    z-index: 1;
-  }
-
-  .timeline__content h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 800;
-    font-family: "Kameron", "Montserrat", system-ui, sans-serif;
-  }
-
-  .timeline__content p {
-    margin: 0;
-    color: var(--color-neutral-content);
-    line-height: 1.6;
-  }
-
-  .timeline__connector {
-    display: none;
-  }
-
-  @media (max-width: 720px) {
-    .timeline {
-      padding: 0 0;
-      margin: 0 0;
-    }
-
-    ol {
-      padding: 0;
-    }
-
-    .timeline--schema {
-      width: min(360px, 95vw);
-      column-gap: clamp(0.75rem, 4vw, 1.75rem);
-      row-gap: clamp(1.25rem, 5vw, 2rem);
-    }
-
-    .timeline--schema::before {
-      width: 82%;
-      height: 82%;
-      background-position: center top;
-      background-size: contain;
-    }
-
-    .timeline--schema .timeline__step {
-      display: contents;
-    }
-
-    .timeline--schema .timeline__content {
-      max-width: clamp(150px, 45vw, 200px);
-      text-align: left;
+    &__list {
+      list-style: none;
       margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+      width: 100%;
+      max-width: 340px;
     }
 
-    .timeline--schema .timeline__step--right .timeline__content {
-      text-align: right;
+    &__item {
+      position: relative;
+      display: flex;
+      justify-content: center;
     }
 
-    .timeline__content h3 {
-      font-size: clamp(0.8rem, 4.2vw, 1.2rem);
+    &__itemInner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+
+      .icon {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
     }
 
-    .timeline__content p {
-      font-size: clamp(0.4rem, 3.1vw, 1rem);
+    &__card {
+      background: var(--color-base-100);
+      box-shadow: var(--shadow-lg);
+      border-radius: 1.75rem;
+      padding: clamp(1.75rem, 5vw, 2.5rem);
+      max-width: 440px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      h3 {
+        margin-top: var(--space-3);
+        font-size: var(--step-2);
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+
+      p {
+        margin: 0;
+        color: var(--color-neutral-content);
+        font-size: var(--step--2);
+        line-height: 1.6;
+        text-align: justify;
+      }
+    }
+
+    &__step {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--color-primary);
+    }
+
+    .chiffres {
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: var(--space-4);
+      background: var(--color-primary);
+      color: var(--color-base-100);
+      text-align: center;
+      padding: clamp(2.5rem, 6vw, 3.5rem);
+      border-radius: 2rem;
+      box-shadow: 0 18px 40px rgba(200, 33, 211, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+
+      h2 {
+        margin: 0;
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        line-height: 1.5;
+
+        .source {
+          display: block;
+          margin-top: 0.75rem;
+          font-size: clamp(0.8rem, 2.5vw, 1rem);
+          font-weight: 100;
+          letter-spacing: 0.18em;
+        }
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    .parcours {
+      &__list {
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        gap: clamp(2rem, 3vw, 3rem);
+        max-width: 1100px;
+      }
+
+      &__item {
+        flex: 1;
+      }
+
+      &__itemInner {
+        align-items: flex-start;
+      }
+
+      &__card {
+        padding: clamp(2rem, 3vw, 2.5rem);
+        text-align: left;
+        max-width: none;
+        min-height: clamp(280px, 32vw, 320px);
+
+        h3 {
+          margin-top: var(--space-2);
+        }
+
+        p {
+          font-size: var(--step--1);
+        }
+      }
+    }
+  }
+
+  @media (min-width: 1080px) {
+    .parcours {
+      &__list {
+        gap: clamp(2.5rem, 3vw, 3.5rem);
+      }
+
+      &__item {
+        flex: 1;
+      }
+
+      &__card {
+        min-height: clamp(300px, 28vw, 340px);
+      }
     }
   }
 </style>
