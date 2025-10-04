@@ -12,7 +12,6 @@ interface Props {
 }
 
 const { title, description, questions } = Astro.props as Props;
-import { Accordion } from "webcoreui/astro";
 import Spacer from "./UI/Spacer.astro";
 ---
 
@@ -21,37 +20,94 @@ import Spacer from "./UI/Spacer.astro";
     <h2>{title}</h2>
     {description && <p>{description}</p>}
   </div>
-  <Accordion
-    items={questions.map(({ question, answer }) => ({
-      title: question,
-      content: answer,
-    }))}
-    className="faq-accordion"
-  />
+  <div class="faq-accordion">
+    {
+      questions.map(({ question, answer }) => (
+        <details class="faq-item">
+          <summary>
+            <span>{question}</span>
+          </summary>
+          <div class="faq-content">
+            <p>{answer}</p>
+          </div>
+        </details>
+      ))
+    }
+  </div>
 
   <Spacer size="2rem" />
 </section>
 
-<style>
-  .faq-accordion {
-    max-width: 90vw;
-    margin: 0 auto;
+<style lang="scss">
+  .questions {
+    .intro {
+      margin: var(--space-3) auto;
+      text-align: center;
+    }
 
-    button {
-      font-family: var(fontBold);
-      font-size: var(--step-0);
+    h2 {
+      color: var(--color-primary);
       font-weight: 600;
+      text-transform: uppercase;
     }
 
-    li {
-      font-family: var(fontRegular);
-      font-size: var(--step-0);
-    }
-  }
-
-  @media (min-width: 960px) {
     .faq-accordion {
-      max-width: 600px;
+      padding: 0 var(--space-4);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+
+      .faq-item {
+        border-bottom: 1px solid rgba(200, 33, 211, 0.2);
+        color: var(--color-primary);
+        padding-block: clamp(0.75rem, 2vw, 1.1rem);
+
+        &:last-of-type {
+          border-bottom-color: transparent;
+        }
+
+        summary {
+          font-family: var(fontBold);
+          font-size: var(--step--1);
+          text-transform: uppercase;
+          padding: 0;
+          list-style: none;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: 700;
+
+          &::marker,
+          &::-webkit-details-marker {
+            display: none;
+          }
+        }
+
+        summary::after {
+          content: "\203A";
+          font-size: 1.5rem;
+          transition: transform 0.2s ease;
+          transform: rotate(90deg);
+        }
+
+        &[open] summary::after {
+          transform: rotate(-90deg);
+        }
+
+        .faq-content {
+          padding-top: var(--space-1);
+          color: var(--color-neutral-content);
+          font-weight: 300;
+
+          p {
+            margin: 0;
+            font-size: var(--step--1);
+            text-align: justify;
+          }
+        }
+      }
     }
   }
 </style>

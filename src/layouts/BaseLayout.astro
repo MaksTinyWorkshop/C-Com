@@ -1,7 +1,7 @@
 ---
 import Navbar from "@components/UI/Navbar/Navbar.astro";
-import CallbackModal from "@components/CTA/CallbackModal.astro";
-import SiteFooter from "@components/UI/SiteFooter.astro";
+import CallbackModal from "@components/Modals/CallbackModal/CallbackModal.astro";
+import SiteFooter from "@components/UI/Footer/SiteFooter.astro";
 
 interface Props {
   title: string;
@@ -37,7 +37,7 @@ const {
   @include setup(
     (
       fontRegular: "/fonts/Montserrat.ttf",
-      fontBold: "/fonts/Vintera.ttf",
+      fontBold: "/fonts/Montserrat.ttf",
       theme: "mindleaf",
     )
   );

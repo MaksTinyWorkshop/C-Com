@@ -1,40 +1,14 @@
 ---
 import Spacer from "@components/UI/Spacer.astro";
 import styles from "./navbar.module.scss";
-import CtaButton from "@components/CTA/CtaButton.astro";
+import CtaToCallback from "@components/CTAs/CTAtoCallback/CtaToCallback.astro";
 import Icon from "@components/Icons/Icon.astro";
 import { mainNavigation, companyDetails } from "@lib/siteData";
+import { resolveUrl, stripBaseFromPath } from "@lib/urlHelpers";
 
-const baseHref = import.meta.env.BASE_URL;
-const withTrailingSlash = (value) =>
-  value.endsWith("/") ? value : `${value}/`;
-const baseWithSlash = withTrailingSlash(baseHref);
+const resolveHref = (path: string) => resolveUrl(path || "/");
 
-const resolveHref = (path) => {
-  if (path === "/" || path === "") {
-    return baseWithSlash;
-  }
-  const normalized = path.startsWith("/") ? path.slice(1) : path;
-  return `${baseWithSlash}${normalized}`;
-};
-
-const normalizeCurrentPath = (pathname) =>
-  pathname.startsWith(baseWithSlash)
-    ? pathname.slice(baseWithSlash.length - 1)
-    : pathname;
-
-const currentPath = normalizeCurrentPath(Astro.url.pathname);
-
-const resolveAsset = (path) => {
-  if (!path) {
-    return "";
-  }
-  if (/^https?:\/\//i.test(path)) {
-    return path;
-  }
-  const normalized = path.startsWith("/") ? path.slice(1) : path;
-  return `${baseWithSlash}${normalized}`;
-};
+const currentPath = stripBaseFromPath(Astro.url.pathname);
 
 const contactItems = companyDetails.contactItems ?? [];
 const logoAsset = (() => {
@@ -43,8 +17,8 @@ const logoAsset = (() => {
     return { url: "", alt: "" };
   }
   return {
-    ...primaryLogo,
-    url: resolveAsset(primaryLogo.source.src),
+    url: resolveUrl(primaryLogo.source.src),
+    alt: primaryLogo.source.alt,
   };
 })();
 
@@ -63,7 +37,7 @@ const menu = mainNavigation.map((item) => {
 });
 ---
 
-<nav>
+<nav data-navbar>
   <div class={styles.navbar}>
     <Spacer size="30px" axis="horizontal" />
     <div class={styles.logo}>
@@ -98,7 +72,7 @@ const menu = mainNavigation.map((item) => {
         }
       </ul>
       <Spacer size="3rem" axis="vertical" />
-      <CtaButton />
+      <CtaToCallback />
     </div>
   </div>
   {
@@ -120,3 +94,5 @@ const menu = mainNavigation.map((item) => {
     )
   }
 </nav>
+
+<script src="./navbar.client.ts"></script>

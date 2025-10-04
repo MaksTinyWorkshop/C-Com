@@ -1,0 +1,91 @@
+---
+import Spacer from "@components/UI/Spacer.astro";
+import { resolveUrl } from "@lib/urlHelpers";
+import styles from "./ctaBanner.module.scss";
+import CtaDevis from "../CTADevis/CtaDevis.astro";
+
+interface CallToAction {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  content?: string;
+  primaryCta?: CallToAction;
+  secondaryCta?: CallToAction;
+}
+
+const { eyebrow, title, description, content, primaryCta, secondaryCta } =
+  Astro.props as Props;
+const resolvedSecondary = secondaryCta
+  ? { ...secondaryCta, href: resolveUrl(secondaryCta.href || "/") }
+  : undefined;
+
+const resolvedClassName = () => {
+  if (eyebrow === "devis") {
+    return styles.devis;
+  }
+  if (eyebrow === "mail") {
+    return styles.mail;
+  }
+  if (eyebrow === "simple") {
+    return styles.simple;
+  }
+};
+---
+
+<section class={`${resolvedClassName()} section-container`}>
+  {
+    eyebrow === "devis" && (
+      <div class={styles.content}>
+        <div class={styles.logo_box}>
+          <img src="/images/company-logo.svg" alt="Logo C'Com" />
+        </div>
+        <div class={styles.cta}>
+          <h2>{title}</h2>
+          {description && <p set:html={description} />}
+          {content && <p class={styles.bold} set:html={content} />}
+        </div>
+        {resolvedSecondary && (
+          <CtaDevis
+            label={resolvedSecondary.label}
+            href={resolvedSecondary.href}
+          />
+        )}
+        <Spacer size=".5rem" />
+      </div>
+    )
+  }
+
+  {
+    eyebrow === "mail" && (
+      <div class={styles.content}>
+        <div class={styles.cta}>
+          <h2>{title}</h2>
+          {description && <p set:html={description} />}
+          {content && <p class={styles.bold} set:html={content} />}
+        </div>
+        {primaryCta && (
+          <a class={styles.secondary_link} href={primaryCta.href}>
+            {primaryCta.label}
+          </a>
+        )}
+        <Spacer size=".5rem" />
+      </div>
+    )
+  }
+
+  {
+    eyebrow === "simple" && (
+      <div class={styles.content}>
+        <div class={styles.cta}>
+          {description && <p set:html={description} />}
+        </div>
+        <Spacer size=".5rem" />
+      </div>
+    )
+  }
+</section>

@@ -1,0 +1,210 @@
+---
+import Icon from "@components/Icons/Icon.astro";
+import type { IconProps } from "@components/Icons/icon";
+import TarifModal from "@components/Modals/TarifModal/TarifModal.astro";
+import styles from "./tarifs.module.scss";
+
+export interface Plan {
+  slug: string;
+  badge: string;
+  icon?: IconProps["type"];
+  subtitle?: string;
+  price: string;
+  footnote?: string;
+  description?: string;
+  moreInfoTitle?: string;
+  moreInfoContent?: string;
+}
+
+export interface Option {
+  id: string;
+  label: string;
+  description?: string;
+  price: string;
+  type?: "base" | "video" | "extra";
+  defaultSelected?: boolean;
+  disabled?: boolean;
+}
+
+export interface ModalContent {
+  title?: string;
+  content: string;
+}
+
+interface Props {
+  defaultPlan: string;
+  plans: Plan[];
+  options: Option[];
+  modal?: ModalContent;
+}
+
+const props = Astro.props as Props;
+
+const planEntries = props.plans ?? [];
+const planMap = new Map(planEntries.map((plan) => [plan.slug, plan]));
+const resolvedDefaultPlan = planMap.has(props.defaultPlan)
+  ? props.defaultPlan
+  : (planEntries[0]?.slug ?? "");
+
+const baseOptionIds = props.options
+  .filter((opt) => (opt.type ?? "extra") === "base")
+  .map((opt) => opt.id);
+
+const videoOptionIds = props.options
+  .filter((opt) => (opt.type ?? "extra") === "video")
+  .map((opt) => opt.id);
+
+const optionDefaults = Object.fromEntries(
+  props.options.map((opt) => [opt.id, opt.defaultSelected ?? false])
+);
+
+const componentId = `tarifs-${Math.random().toString(36).slice(2, 10)}`;
+const modalId = `${componentId}-modal`;
+const configPayload = encodeURIComponent(
+  JSON.stringify({
+    defaultPlan: resolvedDefaultPlan,
+    baseOptionIds,
+    videoOptionIds,
+    optionDefaults,
+    plans: planEntries.map((plan) => ({
+      slug: plan.slug,
+      moreInfoTitle: plan.moreInfoTitle ?? null,
+      moreInfoContent: plan.moreInfoContent ?? null,
+    })),
+    modal: props.modal ?? null,
+  })
+);
+
+const hasModal = Boolean(
+  props.modal || planEntries.some((plan) => plan.moreInfoContent)
+);
+---
+
+<section
+  id={componentId}
+  class={styles.tarifs}
+  data-tarifs-root
+  data-config={configPayload}
+  data-modal-id={hasModal ? modalId : undefined}
+>
+  <div class={styles.shell}>
+    <div class={styles.planDecor}>
+      <div class={styles.planDeck}>
+        {
+          planEntries.map((plan) => (
+            <article
+              class={styles.planCard}
+              data-plan-card
+              data-plan-slug={plan.slug}
+              data-active={plan.slug === resolvedDefaultPlan ? "true" : "false"}
+            >
+              <div class={styles.planBadge}>
+                {plan.icon && (
+                  <span class={styles.planIcon}>
+                    <Icon type={plan.icon} size={64} />
+                  </span>
+                )}
+                <span class={styles.planBadgeText}>{plan.badge}</span>
+              </div>
+              {plan.subtitle && (
+                <p class={styles.planSubtitle}>{plan.subtitle}</p>
+              )}
+              <p class={styles.planPrice}>{plan.price}</p>
+              {plan.footnote && (
+                <p class={styles.planFootnote}>{plan.footnote}</p>
+              )}
+              {plan.description && (
+                <p class={styles.planDescription}>{plan.description}</p>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class={styles.optionsBlock}>
+      <h3 class={styles.optionsTitle}>Options disponibles</h3>
+      <div class={styles.optionStack}>
+        {
+          props.options.map((option) => {
+            const selected = option.defaultSelected ?? false;
+            const optionType = option.type ?? "extra";
+            const disabled = option.disabled ?? false;
+            return (
+              <div
+                class={styles.optionCard}
+                data-option-card
+                data-option-id={option.id}
+                data-option-type={optionType}
+                data-selected={selected ? "true" : "false"}
+                data-disabled={disabled ? "true" : "false"}
+              >
+                <button
+                  type="button"
+                  class={styles.optionToggle}
+                  data-option-toggle
+                  aria-pressed={selected ? "true" : "false"}
+                  disabled={disabled}
+                >
+                  <span
+                    aria-hidden="true"
+                    class={styles.optionToggleMinus}
+                    data-option-minus
+                  >
+                    −
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    class={styles.optionToggleValue}
+                    data-option-value
+                  >
+                    {selected ? "1" : "0"}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    class={styles.optionTogglePlus}
+                    data-option-plus
+                  >
+                    +
+                  </span>
+                </button>
+                <div class={styles.optionDetails}>
+                  <span class={styles.optionPrice}>{option.price}</span>
+                  <span class={styles.optionLabel}>{option.label}</span>
+                  {option.description && (
+                    <p class={styles.optionDescription}>{option.description}</p>
+                  )}
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class={styles.actions}>
+    <a class={styles.ctaPrimary} href="/devis">Demander un devis</a>
+    {
+      hasModal && (
+        <button type="button" class={styles.ctaSecondary} data-modal-open>
+          {props.modal?.title ?? "Plus d'informations"}
+        </button>
+      )
+    }
+  </div>
+
+  {
+    hasModal && (
+      <TarifModal
+        id={modalId}
+        fallbackTitle={props.modal?.title ?? "Plus d'informations"}
+        fallbackContent={props.modal?.content}
+        modal={props.modal}
+      />
+    )
+  }
+
+  <script src="../../components/Modals/TarifModal/tarifModal.client.ts" )
+  ></script>
+</section>

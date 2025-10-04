@@ -1,0 +1,32 @@
+---
+component: feature-grid
+eyebrow: ""
+title: "Secteurs d'activité"
+description: ""
+features:
+  - title: "Commerce de proximité"
+    description: "Outil de management visuel essentiel pour améliorer la productivité et la sécurité"
+    icon: "ccom-magasin"
+  - title: "Industrie"
+    description: "Bureau de tabac, magasins, boutique de créateur"
+    icon: "ccom-usine"
+  - title: "Hôtellerie"
+    description: "Enrichit l'expérience client en diffusant des informations d'accueil et touristiques"
+    icon: "ccom-hotel"
+  - title: "Collectivité"
+    description: "Modernise la communication citoyenne en diffusant instantanément les informations municipales"
+    icon: "ccom-triangle"
+  - title: "Restauration"
+    description: "En vitrine pour attirer les clients ou à l'intérieur pour présenter le menu et fluidifier les commandes."
+    icon: "ccom-food"
+  - title: "Immobilier"
+    description: "Renvoie une image moderne, professionnelle et technologique de l'agence."
+    icon: "ccom-building"
+  - title: "Education"
+    description: " moderniser la communication interne des établissements."
+    icon: "ccom-ecole"
+  - title: "Culturel"
+    description: "Utiliser les écrans pour promouvoir sa programmation de manière vivante et interactive"
+    icon: "ccom-globe"
+
+---

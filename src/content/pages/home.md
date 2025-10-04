@@ -1,11 +1,12 @@
 ---
-title: "Studio Horizon — vitrines Astro prêtes à l'emploi"
-description: "Un exemple de page d'accueil construite à partir de sections markdown."
+title: "C'Com | Accueil"
+description: "Acceuil de l'entreprise C'Com, spécialiste de l'affichage dynamique."
 draft: false
 sections:
-  - slug: hero-accueil
-  - slug: propos-studio
-  - slug: services-studio
-  - slug: temoignages-clients
-  - slug: cta-contact
+  - slug: hero/hero-accueil
+  - slug: cta/cta-devis
+  - slug: parcours/parcours-ccom
+  - slug: markdown/home1
+  - slug: markdown/home2
+  - slug: cta/cta-simple
 ---

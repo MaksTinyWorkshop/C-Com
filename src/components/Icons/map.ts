@@ -8,6 +8,20 @@ import CircleCheck from './icons/circle-check.svg?raw'
 import CircleClose from './icons/circle-close.svg?raw'
 import Close from './icons/close.svg?raw'
 import Copy from './icons/copy.svg?raw'
+import CcomBuilding from './icons/ccom-building.svg?raw'
+import CcomCcom from './icons/ccom-ccom.svg?raw'
+import CcomConnexion from './icons/ccom-connexion.svg?raw'
+import CcomCpro from './icons/ccom-cpro.svg?raw'
+import CcomCsimple from './icons/ccom-csimple.svg?raw'
+import CcomDevis from './icons/ccom-devis.svg?raw'
+import CcomEcole from './icons/ccom-ecole.svg?raw'
+import CcomFood from './icons/ccom-food.svg?raw'
+import CcomGlobe from './icons/ccom-globe.svg?raw'
+import CcomHotel from './icons/ccom-hotel.svg?raw'
+import CcomMagasin from './icons/ccom-magasin.svg?raw'
+import CcomTriangle from './icons/ccom-triangle.svg?raw'
+import CcomUsine from './icons/ccom-usine.svg?raw'
+import CcomValider from './icons/ccom-valider.svg?raw'
 import Discord from './icons/discord.svg?raw'
 import Facebook from './icons/facebook.svg?raw'
 import Github from './icons/github.svg?raw'
@@ -35,6 +49,20 @@ const iconMap = {
     'circle-close': CircleClose,
     'close': Close,
     'copy': Copy,
+    'ccom-building': CcomBuilding,
+    'ccom-ccom': CcomCcom,
+    'ccom-connexion': CcomConnexion,
+    'ccom-cpro': CcomCpro,
+    'ccom-csimple': CcomCsimple,
+    'ccom-devis': CcomDevis,
+    'ccom-ecole': CcomEcole,
+    'ccom-food': CcomFood,
+    'ccom-globe': CcomGlobe,
+    'ccom-hotel': CcomHotel,
+    'ccom-magasin': CcomMagasin,
+    'ccom-triangle': CcomTriangle,
+    'ccom-usine': CcomUsine,
+    'ccom-valider': CcomValider,
     'discord': Discord,
     'facebook': Facebook,
     'github': Github,

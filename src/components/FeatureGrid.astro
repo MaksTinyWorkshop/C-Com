@@ -29,13 +29,7 @@ const { eyebrow, title, description, features } = Astro.props as Props;
       features.map((feature) => (
         <article class="feature">
           <div class="feature__icon">
-            {feature.icon ? (
-              <Icon type={feature.icon as any} />
-            ) : (
-              <span aria-hidden="true" class="feature__fallback">
-                •
-              </span>
-            )}
+            {feature.icon && <Icon type={feature.icon as any} />}
           </div>
           <h3>{feature.title}</h3>
           <p>{feature.description}</p>
@@ -46,52 +40,55 @@ const { eyebrow, title, description, features } = Astro.props as Props;
   <Spacer size="2rem" />
 </section>
 
-<style>
+<style lang="scss">
+  .intro {
+    margin: 0 auto;
+    text-align: center;
+    h2 {
+      margin: var(--space-2) 0 var(--space-5);
+      color: var(--color-primary);
+      font-size: var(--step-2);
+      font-weight: 800;
+    }
+  }
   .features {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-2);
     align-items: center;
-  }
 
-  .feature {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 1.25rem;
-    max-width: 420px;
-  }
+    .feature {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
 
-  .feature__icon {
-    width: var(--space-6);
-    height: var(--space-6);
-    background: var(--color-base-content);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-md);
-  }
+      &__icon {
+        width: var(--space-6);
+        height: var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  .feature__icon :global(svg) {
-    width: var(--space-5);
-    height: var(--space-5);
-    fill: var(--color-primary);
-  }
+      &__icon :global(svg) {
+        width: var(--space-5);
+        height: var(--space-5);
+        fill: var(--color-primary);
+      }
+      h3 {
+        margin: 0;
+        font-size: var(--step-1);
+        font-weight: 600;
+        color: var(--color-primary);
+      }
 
-  .feature__fallback {
-    font-size: var(--step-2);
-    color: var(--color-primary);
-  }
-
-  .feature h3 {
-    margin: 0;
-    font-size: var(--step-1);
-  }
-
-  .feature p {
-    margin: 0;
-    color: var(--color-neutral-content);
-    line-height: 1.6;
+      p {
+        margin: 0;
+        padding: 0 var(--space-6);
+        color: var(--color-neutral-content);
+        font-size: var(--step--2);
+      }
+    }
   }
 </style>

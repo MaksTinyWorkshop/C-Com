@@ -1,10 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
 
 import CatalogueSection from '@components/Catalogue/CatalogueSection.astro';
-import CtaBanner from '@components/CtaBanner.astro';
+import CtaBanner from '@components/CTAs/CTABanner/CtaBanner.astro';
 import FeatureGrid from '@components/FeatureGrid.astro';
 import HeroSection from '@components/Home/HeroSection.astro';
-import MarkdownSection from '@components/MarkdownSection.astro';
+import MarkdownSection from '@components/Markdown/MarkdownSection.astro';
+import Tarifs from '@components/Tarifs/Tarifs.astro';
 import FAQSection from '@components/FAQSection.astro';
 import ParcoursSection from '@components/ParcoursSection.astro';
 import ImagesGrid from '@components/ImagesGrid.astro';
@@ -16,6 +17,7 @@ const componentMap = {
   hero: HeroSection,
   'feature-grid': FeatureGrid,
   parcours: ParcoursSection,
+  tarifs: Tarifs,
   faq: FAQSection,
   markdown: MarkdownSection,
   map: MapSection,
@@ -55,6 +57,16 @@ export async function resolveSection(
           image: section.data.image,
         },
       };
+    case 'tarifs':
+      return {
+        Component,
+        props: {
+          defaultPlan: section.data.defaultPlan,
+          plans: section.data.plans,
+          options: section.data.options,
+          modal: section.data.modal,
+        },
+      };
     case 'feature-grid':
       return {
         Component,
@@ -91,6 +103,7 @@ export async function resolveSection(
         props: {
           title: section.data.title,
           description: section.data.description,
+          variant: section.data.variant,
           images: section.data.images,
           Content,
         },

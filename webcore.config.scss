@@ -1,7 +1,7 @@
 :root {
   /*Variables nommées comme DaisyUI*/
   --color-base-100: #FAF4F4; /* rgb(216, 245, 255) */
-  --color-base-200: #D8F5FF; /* rgb(216, 245, 255) */
+  --color-base-200: #F3F3F3; /* rgb(243, 243, 243) */
   --color-base-300: #9DD0FB; /* rgb(157, 208, 251) */
   --color-base-content: #040404; /* rgb(4, 4, 4) */
 
@@ -51,7 +51,7 @@
   
   /* Variables d'espacement Padding | Margin */
   --space-1: clamp(0.5rem, 1vw, 1rem);          /* 8–16px */
-  --space-2: clamp(1rem, 2vw, 1.5rem);          /* 16–24px */
+  --space-2: clamp(1rem, 1.5vw, 1.5rem);          /* 16–24px */
   --space-3: clamp(1.5rem, 3vw, 2.5rem);        /* 24–40px */
   --space-4: clamp(2rem, 4vw, 3rem);            /* 32–48px */
   --space-5: clamp(3rem, 6vw, 4rem);            /* 48–64px */

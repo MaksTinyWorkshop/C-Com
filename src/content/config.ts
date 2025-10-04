@@ -6,6 +6,42 @@ const callToActionSchema = z.object({
   icon: z.string().optional(),
 });
 
+const tarifsOptionSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  description: z.string().optional(),
+  price: z.string(),
+  type: z.enum(['base', 'video', 'extra']).default('extra'),
+  defaultSelected: z.boolean().optional(),
+  disabled: z.boolean().optional(),
+});
+
+const tarifsPlanSchema = z.object({
+  slug: z.string(),
+  badge: z.string(),
+  icon: z.string().optional(),
+  subtitle: z.string().optional(),
+  price: z.string(),
+  footnote: z.string().optional(),
+  description: z.string().optional(),
+  moreInfoTitle: z.string().optional(),
+  moreInfoContent: z.string().optional(),
+});
+
+const tarifsSchema = z.object({
+  component: z.literal('tarifs'),
+  defaultPlan: z.string(),
+  plans: z.array(tarifsPlanSchema).min(1),
+  options: z.array(tarifsOptionSchema).min(1),
+  modal: z
+    .object({
+      title: z.string().optional(),
+      content: z.string(),
+    })
+    .optional(),
+});
+
+
 const heroSchema = z.object({
   component: z.literal('hero'),
   eyebrow: z.string().optional(),
@@ -72,6 +108,7 @@ const faqSchema = z.object({
 const markdownSchema = z.object({
   component: z.literal('markdown'),
   title: z.string().optional(),
+  variant: z.string().optional(),
   description: z.string().optional(),
   images: z
     .array(
@@ -172,6 +209,7 @@ const sectionSchema = z.discriminatedUnion('component', [
   imagesSchema,
   catalogueSchema,
   testimonialsSchema,
+  tarifsSchema,
 ]);
 
 const sections = defineCollection({

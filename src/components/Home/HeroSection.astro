@@ -1,12 +1,13 @@
 ---
+import { resolveUrl } from "@lib/urlHelpers";
+import Icon from "@components/Icons/Icon.astro";
+import CtaDevis from "@components/CTAs/CTADevis/CtaDevis.astro";
+
 interface CallToAction {
   label: string;
   href: string;
   icon?: string;
 }
-
-import CtaButton from "@components/CTA/CtaButton.astro";
-import Icon from "@components/Icons/Icon.astro";
 
 interface Props {
   eyebrow?: string;
@@ -20,25 +21,6 @@ interface Props {
     alt?: string;
   };
 }
-
-const baseHref = import.meta.env.BASE_URL;
-const withTrailingSlash = (value) =>
-  value.endsWith("/") ? value : `${value}/`;
-const baseWithSlash = withTrailingSlash(baseHref);
-const isExternal = (path) => /^(?:[a-z+]+:)?\/\//i.test(path);
-const resolveUrl = (path) => {
-  if (!path || path === "") {
-    return baseWithSlash;
-  }
-  if (isExternal(path) || path.startsWith("#")) {
-    return path;
-  }
-  if (path === "/") {
-    return baseWithSlash;
-  }
-  const normalized = path.startsWith("/") ? path.slice(1) : path;
-  return `${baseWithSlash}${normalized}`;
-};
 
 const {
   eyebrow,
@@ -54,23 +36,23 @@ const ctaCards = (
   [primaryCta, secondaryCta, tertiaryCta].filter(Boolean) as CallToAction[]
 ).map((cta) => ({
   ...cta,
-  href: resolveUrl(cta.href),
+  href: resolveUrl(cta.href || "/"),
 }));
 
 const backgroundStyle = image
   ? `background-image: url(${resolveUrl(image.src)});`
   : undefined;
+
+const emphasizePhrase = (value: string) =>
+  value.replace(/(régie\s+publicitaire)/gi, "<strong>$1</strong>");
 ---
 
 <section class="hero" style={backgroundStyle}>
   <div class="hero__content">
     <div class="copy">
       {eyebrow && <span class="eyebrow">{eyebrow}</span>}
-      <h1>{title}</h1>
+      <h1 set:html={emphasizePhrase(title)} />
       <p set:html={content} />
-      <div class="cta-primary">
-        <CtaButton />
-      </div>
     </div>
 
     {
@@ -78,14 +60,7 @@ const backgroundStyle = image
         <ul class="cta-cards">
           {ctaCards.map((cta, index) => (
             <li>
-              <a href={cta.href} class="cta-card">
-                {cta.icon && (
-                  <span class="cta-card__icon" aria-hidden="true">
-                    <Icon type={cta.icon} />
-                  </span>
-                )}
-                <span class="cta-card__label">{cta.label}</span>
-              </a>
+              <CtaDevis label={cta.label} href={cta.href} />
             </li>
           ))}
         </ul>
@@ -97,7 +72,7 @@ const backgroundStyle = image
 <style>
   .hero {
     position: relative;
-    min-height: calc(100vh - 3rem);
+    height: calc(100vh - var(--navbar-total-height));
     padding: 0 var(--space-3);
     display: flex;
     align-items: center;
@@ -115,8 +90,8 @@ const backgroundStyle = image
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.25),
-      rgba(0, 0, 0, 0.55)
+      var(--color-primary-transp),
+      var(--color-primary-transp)
     );
     pointer-events: none;
   }
@@ -134,7 +109,6 @@ const backgroundStyle = image
   .copy {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
   }
 
   .copy h1 {
@@ -143,6 +117,11 @@ const backgroundStyle = image
     font-size: var(--step-5);
     text-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
     font-family: var(fontBold);
+    color: var(--color-base-100);
+
+    strong {
+      font-weight: 600;
+    }
   }
 
   .copy p {
@@ -180,25 +159,18 @@ const backgroundStyle = image
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
   }
 
   .cta-card {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: var(--space-2);
-    background: rgba(0, 0, 0, 0.72);
-    border: 2px solid var(--color-primary);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-base-100);
     font-weight: 600;
     font-size: var(--step-1);
-    letter-spacing: 0.05em;
-    color: var(--color-base-100);
-    text-transform: uppercase;
+    border-radius: var(--radius-full);
+    color: var(--color-primary);
     transition:
       transform 0.2s ease,
       box-shadow 0.2s ease;
-    gap: var(--space-1);
   }
 
   .cta-card:hover,

@@ -32,7 +32,7 @@ const {
 const sectionClass = [
   "section-container",
   styles.markdown,
-  variant ? styles[`markdown--${variant}`] ?? "" : "",
+  variant ? (styles[`markdown--${variant}`] ?? "") : "",
 ]
   .filter(Boolean)
   .join(" ");

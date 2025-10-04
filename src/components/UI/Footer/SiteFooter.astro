@@ -1,0 +1,42 @@
+---
+import { companyDetails } from "@lib/siteData";
+import { resolveUrl } from "@lib/urlHelpers";
+import styles from "./footer.module.scss";
+import Spacer from "../Spacer.astro";
+import CtaDevis from "@components/CTAs/CTADevis/CtaDevis.astro";
+
+const year = new Date().getFullYear();
+
+const secondaryLogo = companyDetails.logos?.[1];
+const secondaryLogoSrc = secondaryLogo
+  ? resolveUrl(secondaryLogo.source.src)
+  : "";
+---
+
+<footer class={styles.footer}>
+  <div class={styles.logo} aria-hidden="true">
+    {
+      secondaryLogoSrc && (
+        <img
+          src={secondaryLogoSrc}
+          alt={secondaryLogo?.source.alt ?? "Logo secondaire"}
+          loading="lazy"
+        />
+      )
+    }
+  </div>
+
+  <CtaDevis label="Demander un devis" href={resolveUrl("/devis")} />
+
+  <div class={styles.cgv_legals}>
+    <a class={styles.link} href={resolveUrl("/mentions-legales")}>
+      Mentions légales
+    </a>
+    <Spacer size="1rem" axis="horizontal" />
+    <a class={styles.link} href={resolveUrl("/cgv")}> CGV </a>
+  </div>
+  <p class={styles.copyright}>
+    Propulsé par Mindleaf © {year} |
+    {companyDetails.name}.
+  </p>
+</footer>

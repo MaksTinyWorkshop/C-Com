@@ -6,9 +6,10 @@ export type NavItem = {
 };
 
 export const mainNavigation: NavItem[] = [
-  { name: "Page 1", path: "/page-1" },
-  { name: "Page 2", path: "/page-2" },
-  { name: "Page 3", path: "/page-3" },
+  { name: "Fonctionnement", path: "/fonctionnement" },
+  { name: "Secteurs d'activités", path: "/secteurs" },
+  { name: "Tarifs", path: "/tarifs" },
+  { name: "Page 3", path: "/devis" },
 ];
 
 export type LogoAsset = {
@@ -45,7 +46,7 @@ export type CompanyDetails = {
 };
 
 export const companyDetails: CompanyDetails = {
-  name: "Mon Entreprise",
+  name: "C'Com",
   address: "1 Rue de la Paix",
   zipCode: "75000",
   city: "Paris",
@@ -88,7 +89,14 @@ export const companyDetails: CompanyDetails = {
       name: "Logo Principal",
       source: {
         src: "images/company-logo.svg",
-        alt: "Logo Mon Entreprise",
+        alt: "Logo C'com",
+      }
+    },
+    {
+      name: "Logo Full",
+      source: {
+        src: "images/company-logo-full.svg",
+        alt: "Logo C'Com",
       }
     }
   ] 

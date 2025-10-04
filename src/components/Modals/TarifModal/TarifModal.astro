@@ -1,0 +1,54 @@
+---
+import styles from "./tarifModal.module.scss";
+
+interface ModalContent {
+  title?: string;
+  content?: string;
+}
+
+interface Props {
+  id: string;
+  fallbackTitle: string;
+  fallbackContent?: string;
+  modal?: ModalContent | null;
+}
+
+const { id, fallbackTitle, fallbackContent, modal } = Astro.props as Props;
+const title = modal?.title ?? fallbackTitle;
+---
+<dialog
+  id={id}
+  class={styles.modal}
+  data-tarif-modal
+  aria-labelledby={`${id}-title`}
+  aria-describedby={`${id}-body`}
+>
+  <div class={styles.modalInner}>
+    <header class={styles.modalHeader}>
+      <h3 id={`${id}-title`} data-modal-title>
+        {title}
+      </h3>
+      <button
+        type="button"
+        class={styles.modalClose}
+        data-modal-close
+        aria-label="Fermer"
+      >
+        ×
+      </button>
+    </header>
+    <div
+      id={`${id}-body`}
+      class={styles.modalBody}
+      data-modal-body
+    >
+      {modal?.content ? (
+        <Fragment set:html={modal.content} />
+      ) : fallbackContent ? (
+        <Fragment set:html={fallbackContent} />
+      ) : (
+        <p>Aucune information complémentaire pour le moment.</p>
+      )}
+    </div>
+  </div>
+</dialog>
