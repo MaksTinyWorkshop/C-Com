@@ -28,7 +28,7 @@ export interface Option {
 
 export interface ModalContent {
   title?: string;
-  content: string;
+  content?: string;
 }
 
 interface Props {
@@ -82,7 +82,7 @@ const hasModal = Boolean(
 
 <section
   id={componentId}
-  class={styles.tarifs}
+  class={`${styles.tarifs} section-container`}
   data-tarifs-root
   data-config={configPayload}
   data-modal-id={hasModal ? modalId : undefined}
@@ -104,7 +104,6 @@ const hasModal = Boolean(
                     <Icon type={plan.icon} size={64} />
                   </span>
                 )}
-                <span class={styles.planBadgeText}>{plan.badge}</span>
               </div>
               {plan.subtitle && (
                 <p class={styles.planSubtitle}>{plan.subtitle}</p>
@@ -187,7 +186,11 @@ const hasModal = Boolean(
     <a class={styles.ctaPrimary} href="/devis">Demander un devis</a>
     {
       hasModal && (
-        <button type="button" class={styles.ctaSecondary} data-modal-open>
+        <button
+          type="button"
+          class={styles.ctaSecondary}
+          data-tarif-modal-trigger
+        >
           {props.modal?.title ?? "Plus d'informations"}
         </button>
       )
@@ -200,11 +203,8 @@ const hasModal = Boolean(
         id={modalId}
         fallbackTitle={props.modal?.title ?? "Plus d'informations"}
         fallbackContent={props.modal?.content}
-        modal={props.modal}
       />
     )
   }
-
-  <script src="../../components/Modals/TarifModal/tarifModal.client.ts" )
-  ></script>
 </section>
+<script src="../Modals/TarifModal/tarifModal.client.ts"></script>

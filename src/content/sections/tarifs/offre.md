@@ -6,8 +6,8 @@ plans:
     badge: "C'Simple"
     icon: ccom-csimple
     subtitle: "Tarif diffusion"
-    price: "40€ ht/mois*"
-    footnote: "Contrat d’un an 480€ ht*"
+    price: "80€ ht/mois*"
+    footnote: "Contrat d’un an 960€ ht*"
     description: "Une offre essentielle pour diffuser un visuel créé par vos soins."
     moreInfoTitle: "Ce qui est inclus dans l'offre C'Simple"
     moreInfoContent: >-
@@ -20,8 +20,8 @@ plans:
     badge: "C'Com"
     icon: ccom-ccom
     subtitle: "Tarif diffusion"
-    price: "60€ ht/mois*"
-    footnote: "Contrat d’un an 720€ ht*"
+    price: "80€ ht/mois*"
+    footnote: "Contrat d’un an 960€ ht*"
     description: "Nous créons pour vous un visuel percutant pour animer vos écrans."
     moreInfoTitle: "Ce qui est inclus dans l'offre C'Com"
     moreInfoContent: >-
@@ -62,7 +62,7 @@ options:
     price: "Sur devis"
     type: video
 modal:
-  title: "En savoir plus sur nos prestations"
+  title: "+ d'infos"
   content: >-
     <p>Chaque offre inclut l'installation à distance, la programmation de vos campagnes et un suivi mensuel.</p>
     <p>Vous bénéficiez d'un interlocuteur dédié pour définir les objectifs et ajuster vos contenus aux temps forts de votre communication.</p>

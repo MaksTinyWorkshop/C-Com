@@ -18,6 +18,11 @@ type TarifConfig = {
   modal: ModalContent | null;
 };
 
+const ROOT_SELECTOR = "[data-tarifs-root]";
+const TRIGGER_SELECTOR = "[data-tarif-modal-trigger]";
+const PLAN_CARD_SELECTOR = "[data-plan-card]";
+const OPTION_CARD_SELECTOR = "[data-option-card]";
+
 const decodeConfig = (value: string | null | undefined): TarifConfig | null => {
   if (!value) return null;
   try {
@@ -28,9 +33,17 @@ const decodeConfig = (value: string | null | undefined): TarifConfig | null => {
   }
 };
 
-const pickPlan = (plans: Map<string, PlanConfig>, slug?: string | null) => {
-  if (!slug) return null;
-  return plans.has(slug) ? slug : null;
+const pickPlanSlug = (plans: Map<string, PlanConfig>, slug?: string | null) =>
+  slug && plans.has(slug) ? slug : null;
+
+const applySelectionState = (card: HTMLElement, selected: boolean) => {
+  card.dataset.selected = selected ? "true" : "false";
+  const toggle = card.querySelector<HTMLElement>("[data-option-toggle]");
+  toggle?.setAttribute("aria-pressed", selected ? "true" : "false");
+  const valueNode = toggle?.querySelector<HTMLElement>("[data-option-value]");
+  if (valueNode) {
+    valueNode.textContent = selected ? "1" : "0";
+  }
 };
 
 const initialiseRoot = (root: HTMLElement) => {
@@ -44,25 +57,12 @@ const initialiseRoot = (root: HTMLElement) => {
   }
 
   const planCards = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-plan-card]")
+    root.querySelectorAll<HTMLElement>(PLAN_CARD_SELECTOR)
   );
   const optionCards = Array.from(
-    root.querySelectorAll<HTMLElement>("[data-option-card]")
+    root.querySelectorAll<HTMLElement>(OPTION_CARD_SELECTOR)
   );
-
-  const planDetails = new Map(
-    config.plans.map((plan) => [plan.slug, plan])
-  );
-
-  const applySelectionState = (card: HTMLElement, selected: boolean) => {
-    card.dataset.selected = selected ? "true" : "false";
-    const toggle = card.querySelector<HTMLElement>("[data-option-toggle]");
-    toggle?.setAttribute("aria-pressed", selected ? "true" : "false");
-    const valueNode = toggle?.querySelector<HTMLElement>("[data-option-value]");
-    if (valueNode) {
-      valueNode.textContent = selected ? "1" : "0";
-    }
-  };
+  const planDetails = new Map(config.plans.map((plan) => [plan.slug, plan]));
 
   optionCards.forEach((card) => {
     const optionId = card.dataset.optionId ?? "";
@@ -70,7 +70,7 @@ const initialiseRoot = (root: HTMLElement) => {
     applySelectionState(card, isSelected);
   });
 
-  const updatePlan = () => {
+  const updateActivePlan = () => {
     const hasBase = optionCards
       .filter((card) => card.dataset.optionType === "base")
       .some((card) => card.dataset.selected === "true");
@@ -78,24 +78,25 @@ const initialiseRoot = (root: HTMLElement) => {
       .filter((card) => card.dataset.optionType === "video")
       .some((card) => card.dataset.selected === "true");
 
-    let current = pickPlan(planDetails, config.defaultPlan) ?? planCards[0]?.dataset.planSlug ?? "";
+    let slug = pickPlanSlug(planDetails, config.defaultPlan) ??
+      planCards[0]?.dataset.planSlug ?? "";
 
-    const simpleSlug = pickPlan(planDetails, "csimple");
-    const proSlug = pickPlan(planDetails, "cpro");
+    const simpleSlug = pickPlanSlug(planDetails, "csimple");
+    const proSlug = pickPlanSlug(planDetails, "cpro");
 
     if (!hasBase && simpleSlug) {
-      current = simpleSlug;
+      slug = simpleSlug;
     }
 
     if (hasVideo && proSlug) {
-      current = proSlug;
+      slug = proSlug;
     }
 
     planCards.forEach((card) => {
-      card.dataset.active = card.dataset.planSlug === current ? "true" : "false";
+      card.dataset.active = card.dataset.planSlug === slug ? "true" : "false";
     });
 
-    return current;
+    return slug;
   };
 
   optionCards.forEach((card) => {
@@ -111,77 +112,112 @@ const initialiseRoot = (root: HTMLElement) => {
     toggle.addEventListener("click", () => {
       const next = card.dataset.selected !== "true";
       applySelectionState(card, next);
-      updatePlan();
+      updateActivePlan();
     });
   });
 
-  updatePlan();
-
+  let modalRoot: HTMLElement | null = null;
   const modalId = root.dataset.modalId;
-  const modal = modalId
-    ? (document.getElementById(modalId) as HTMLDialogElement | null)
-    : null;
-  const openButton = root.querySelector<HTMLButtonElement>("[data-modal-open]");
+  if (modalId) {
+    modalRoot = document.getElementById(modalId);
+  }
+  if (!modalRoot) {
+    modalRoot = root.querySelector<HTMLElement>("[data-tarif-modal-root]");
+  }
 
-  const renderModalContent = (planSlug: string) => {
-    if (!modal) return;
-    const titleNode = modal.querySelector<HTMLElement>("[data-modal-title]");
-    const bodyNode = modal.querySelector<HTMLElement>("[data-modal-body]");
-    const plan = planDetails.get(planSlug);
+  const modalTitle = modalRoot?.querySelector<HTMLElement>("[data-modal-title]");
+  const modalBody = modalRoot?.querySelector<HTMLElement>("[data-modal-body]");
+  const closeButtons = modalRoot?.querySelectorAll<HTMLButtonElement>(
+    "[data-modal-close]"
+  );
+
+  let lastFocused: HTMLElement | null = null;
+
+  const renderModalContent = (slug: string) => {
+    if (!modalRoot) return;
+    const plan = planDetails.get(slug);
     const fallback = config.modal ?? {};
     const title = plan?.moreInfoTitle || fallback.title || "Plus d'informations";
-    const pieces = [] as string[];
 
+    const pieces: string[] = [];
     if (plan?.moreInfoContent) pieces.push(plan.moreInfoContent);
     if (fallback.content) pieces.push(fallback.content);
 
-    if (titleNode) {
-      titleNode.textContent = title;
+    if (modalTitle) {
+      modalTitle.textContent = title;
     }
 
-    if (bodyNode) {
-      bodyNode.innerHTML = pieces.join("") ||
+    if (modalBody) {
+      modalBody.innerHTML = pieces.join("") ||
         "<p>Aucune information complémentaire pour le moment.</p>";
     }
   };
 
-  if (modal && openButton) {
-    const closeButton = modal.querySelector<HTMLButtonElement>("[data-modal-close]");
+  const closeModal = () => {
+    if (!modalRoot) return;
+    modalRoot.dataset.open = "false";
+    modalRoot.setAttribute("aria-hidden", "true");
+    document.removeEventListener("keydown", handleKeydown);
 
-    openButton.addEventListener("click", () => {
-      const slug = updatePlan();
-      renderModalContent(slug);
-      if (typeof modal.showModal === "function") {
-        modal.showModal();
-      }
-    });
+    const target = lastFocused;
+    lastFocused = null;
+    target?.focus({ preventScroll: true });
+  };
 
-    closeButton?.addEventListener("click", () => {
-      modal.close();
-    });
-
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        modal.close();
-      }
-    });
-
-    modal.addEventListener("cancel", (event) => {
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
       event.preventDefault();
-      modal.close();
-    });
-  }
+      closeModal();
+    }
+  };
 
+  const openModal = () => {
+    if (!modalRoot) return;
+    lastFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const slug = updateActivePlan();
+    renderModalContent(slug);
+    modalRoot.dataset.open = "true";
+    modalRoot.setAttribute("aria-hidden", "false");
+    document.addEventListener("keydown", handleKeydown);
+
+    const focusTarget = modalRoot.querySelector<HTMLElement>(
+      "[data-modal-close], button, a, input, select, textarea"
+    );
+    focusTarget?.focus({ preventScroll: true });
+  };
+
+  closeButtons?.forEach((button) => {
+    button.addEventListener("click", () => closeModal());
+  });
+
+  modalRoot?.addEventListener("click", (event) => {
+    if (event.target === modalRoot) {
+      closeModal();
+    }
+  });
+
+  const triggers = root.querySelectorAll<HTMLElement>(TRIGGER_SELECTOR);
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      openModal();
+    });
+  });
+
+  updateActivePlan();
   root.dataset.initialised = "true";
 };
 
-const initAll = () => {
-  const roots = document.querySelectorAll<HTMLElement>("[data-tarifs-root]");
-  roots.forEach(initialiseRoot);
+const initialiseAll = () => {
+  document.querySelectorAll<HTMLElement>(ROOT_SELECTOR).forEach((root) => {
+    initialiseRoot(root);
+  });
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initAll, { once: true });
+  document.addEventListener("DOMContentLoaded", initialiseAll, { once: true });
 } else {
-  initAll();
+  initialiseAll();
 }
