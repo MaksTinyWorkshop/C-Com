@@ -18,7 +18,6 @@ const tarifsOptionSchema = z.object({
 
 const tarifsPlanSchema = z.object({
   slug: z.string(),
-  badge: z.string(),
   icon: z.string().optional(),
   subtitle: z.string().optional(),
   price: z.string(),

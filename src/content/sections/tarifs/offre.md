@@ -3,7 +3,6 @@ component: tarifs
 defaultPlan: ccom
 plans:
   - slug: csimple
-    badge: "C'Simple"
     icon: ccom-csimple
     subtitle: "Tarif diffusion"
     price: "80€ ht/mois*"
@@ -14,10 +13,9 @@ plans:
       <ul>
         <li>Diffusion de votre visuel statique sur le réseau sélectionné.</li>
         <li>Mise à jour mensuelle des campagnes.</li>
-        <li>Accès à notre équipe support par e-mail.</li>
+        <li>Accès à notre équipe support.</li>
       </ul>
   - slug: ccom
-    badge: "C'Com"
     icon: ccom-ccom
     subtitle: "Tarif diffusion"
     price: "80€ ht/mois*"
@@ -31,7 +29,6 @@ plans:
         <li>Suivi régulier et ajustements illimités.</li>
       </ul>
   - slug: cpro
-    badge: "C'Pro"
     icon: ccom-cpro
     subtitle: "Tarif diffusion"
     price: "80€ ht/mois*"
@@ -64,6 +61,6 @@ options:
 modal:
   title: "+ d'infos"
   content: >-
-    <p>Chaque offre inclut l'installation à distance, la programmation de vos campagnes et un suivi mensuel.</p>
+    <p>Chaque offre inclut l'installation, la programmation de vos campagnes et un suivi mensuel.</p>
     <p>Vous bénéficiez d'un interlocuteur dédié pour définir les objectifs et ajuster vos contenus aux temps forts de votre communication.</p>
 ---

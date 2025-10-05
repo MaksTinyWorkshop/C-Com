@@ -24,12 +24,23 @@ export interface Option {
   type?: "base" | "video" | "extra";
   defaultSelected?: boolean;
   disabled?: boolean;
+  defaultQuantity?: number;
+  minQuantity?: number;
+  maxQuantity?: number;
+  step?: number;
 }
 
 export interface ModalContent {
   title?: string;
   content?: string;
 }
+
+type OptionConstraintConfig = {
+  min: number;
+  max: number | null;
+  step: number;
+  quantity: number;
+};
 
 interface Props {
   defaultPlan: string;
@@ -54,8 +65,34 @@ const videoOptionIds = props.options
   .filter((opt) => (opt.type ?? "extra") === "video")
   .map((opt) => opt.id);
 
-const optionDefaults = Object.fromEntries(
-  props.options.map((opt) => [opt.id, opt.defaultSelected ?? false])
+const optionConstraints = Object.fromEntries(
+  props.options.map((opt) => {
+    const min = opt.minQuantity ?? 0;
+    const max =
+      typeof opt.maxQuantity === "number" && Number.isFinite(opt.maxQuantity)
+        ? opt.maxQuantity
+        : null;
+    const step = opt.step && opt.step > 0 ? opt.step : 1;
+    let quantity =
+      typeof opt.defaultQuantity === "number"
+        ? opt.defaultQuantity
+        : opt.defaultSelected
+          ? 1
+          : 0;
+    quantity = Math.max(quantity, min);
+    if (typeof max === "number") {
+      quantity = Math.min(quantity, max);
+    }
+    const config: OptionConstraintConfig = { min, max, step, quantity };
+    return [opt.id, config];
+  })
+) as Record<string, OptionConstraintConfig>;
+
+const optionQuantities = Object.fromEntries(
+  Object.entries(optionConstraints).map(([id, constraint]) => [
+    id,
+    constraint.quantity,
+  ])
 );
 
 const componentId = `tarifs-${Math.random().toString(36).slice(2, 10)}`;
@@ -65,7 +102,17 @@ const configPayload = encodeURIComponent(
     defaultPlan: resolvedDefaultPlan,
     baseOptionIds,
     videoOptionIds,
-    optionDefaults,
+    optionQuantities,
+    optionConstraints: Object.fromEntries(
+      Object.entries(optionConstraints).map(([id, constraint]) => [
+        id,
+        {
+          min: constraint.min,
+          max: constraint.max,
+          step: constraint.step,
+        },
+      ])
+    ),
     plans: planEntries.map((plan) => ({
       slug: plan.slug,
       moreInfoTitle: plan.moreInfoTitle ?? null,
@@ -126,9 +173,16 @@ const hasModal = Boolean(
       <div class={styles.optionStack}>
         {
           props.options.map((option) => {
-            const selected = option.defaultSelected ?? false;
             const optionType = option.type ?? "extra";
             const disabled = option.disabled ?? false;
+            const constraint = optionConstraints[option.id] ?? {
+              min: 0,
+              max: null,
+              step: 1,
+              quantity: 0,
+            };
+            const quantity = constraint.quantity;
+            const selected = quantity > 0;
             return (
               <div
                 class={styles.optionCard}
@@ -137,36 +191,46 @@ const hasModal = Boolean(
                 data-option-type={optionType}
                 data-selected={selected ? "true" : "false"}
                 data-disabled={disabled ? "true" : "false"}
+                data-quantity={quantity}
+                data-min={constraint.min}
+                data-max={
+                  typeof constraint.max === "number"
+                    ? constraint.max
+                    : undefined
+                }
+                data-step={constraint.step}
               >
-                <button
-                  type="button"
-                  class={styles.optionToggle}
-                  data-option-toggle
-                  aria-pressed={selected ? "true" : "false"}
-                  disabled={disabled}
-                >
-                  <span
-                    aria-hidden="true"
-                    class={styles.optionToggleMinus}
-                    data-option-minus
+                <div class={styles.optionToggle} data-option-counter>
+                  <button
+                    type="button"
+                    class={`${styles.optionButton} ${styles.optionToggleMinus}`}
+                    data-option-decrement
+                    aria-label={`Réduire la quantité pour ${option.label}`}
+                    disabled={disabled || quantity <= constraint.min}
                   >
                     −
-                  </span>
+                  </button>
                   <span
-                    aria-hidden="true"
+                    aria-live="polite"
                     class={styles.optionToggleValue}
                     data-option-value
                   >
-                    {selected ? "1" : "0"}
+                    {quantity}
                   </span>
-                  <span
-                    aria-hidden="true"
-                    class={styles.optionTogglePlus}
-                    data-option-plus
+                  <button
+                    type="button"
+                    class={`${styles.optionButton} ${styles.optionTogglePlus}`}
+                    data-option-increment
+                    aria-label={`Augmenter la quantité pour ${option.label}`}
+                    disabled={
+                      disabled ||
+                      (typeof constraint.max === "number" &&
+                        quantity >= constraint.max)
+                    }
                   >
                     +
-                  </span>
-                </button>
+                  </button>
+                </div>
                 <div class={styles.optionDetails}>
                   <span class={styles.optionPrice}>{option.price}</span>
                   <span class={styles.optionLabel}>{option.label}</span>
@@ -207,4 +271,5 @@ const hasModal = Boolean(
     )
   }
 </section>
+
 <script src="../Modals/TarifModal/tarifModal.client.ts"></script>
