@@ -9,7 +9,7 @@ export const mainNavigation: NavItem[] = [
   { name: "Fonctionnement", path: "/fonctionnement" },
   { name: "Secteurs d'activités", path: "/secteurs" },
   { name: "Tarifs", path: "/tarifs" },
-  { name: "Page 3", path: "/devis" },
+  { name: "Contact", path: "/contact" },
 ];
 
 export type LogoAsset = {

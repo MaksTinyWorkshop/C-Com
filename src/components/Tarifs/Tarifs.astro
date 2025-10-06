@@ -2,11 +2,12 @@
 import Icon from "@components/Icons/Icon.astro";
 import type { IconProps } from "@components/Icons/icon";
 import TarifModal from "@components/Modals/TarifModal/TarifModal.astro";
+import modalStyles from "@components/Modals/TarifModal/tarifModal.module.scss";
 import styles from "./tarifs.module.scss";
 
 export interface Plan {
   slug: string;
-  badge: string;
+  badge?: string;
   icon?: IconProps["type"];
   subtitle?: string;
   price: string;
@@ -28,6 +29,9 @@ export interface Option {
   minQuantity?: number;
   maxQuantity?: number;
   step?: number;
+  unitPrice?: number;
+  priceSuffix?: string;
+  showCounter?: boolean;
 }
 
 export interface ModalContent {
@@ -50,6 +54,14 @@ interface Props {
 }
 
 const props = Astro.props as Props;
+
+const replaceModalScopedClasses = (input?: string | null) => {
+  if (!input) return input ?? null;
+  return input.replace(/\{styles\.([\w-]+)\}/g, (_, token) => {
+    const resolved = modalStyles[token as keyof typeof modalStyles];
+    return typeof resolved === "string" ? resolved : token;
+  });
+};
 
 const planEntries = props.plans ?? [];
 const planMap = new Map(planEntries.map((plan) => [plan.slug, plan]));
@@ -97,6 +109,14 @@ const optionQuantities = Object.fromEntries(
 
 const componentId = `tarifs-${Math.random().toString(36).slice(2, 10)}`;
 const modalId = `${componentId}-modal`;
+
+const defaultPlanEntry = planMap.get(resolvedDefaultPlan);
+const defaultPlanIcon = defaultPlanEntry?.icon ?? null;
+const defaultPlanBadge = defaultPlanEntry?.badge ?? null;
+
+const modalSharedContent = replaceModalScopedClasses(props.modal?.content ?? "") ?? "";
+const initialPlanDetailContent =
+  replaceModalScopedClasses(defaultPlanEntry?.moreInfoContent ?? "") ?? "";
 const configPayload = encodeURIComponent(
   JSON.stringify({
     defaultPlan: resolvedDefaultPlan,
@@ -115,8 +135,10 @@ const configPayload = encodeURIComponent(
     ),
     plans: planEntries.map((plan) => ({
       slug: plan.slug,
+      badge: plan.badge ?? null,
       moreInfoTitle: plan.moreInfoTitle ?? null,
-      moreInfoContent: plan.moreInfoContent ?? null,
+      moreInfoContent:
+        replaceModalScopedClasses(plan.moreInfoContent ?? null) ?? null,
     })),
     modal: props.modal ?? null,
   })
@@ -147,9 +169,12 @@ const hasModal = Boolean(
             >
               <div class={styles.planBadge}>
                 {plan.icon && (
-                  <span class={styles.planIcon}>
+                  <span class={styles.planIcon} data-plan-icon>
                     <Icon type={plan.icon} size={64} />
                   </span>
+                )}
+                {plan.badge && (
+                  <span class={styles.planBadgeText}>{plan.badge}</span>
                 )}
               </div>
               {plan.subtitle && (
@@ -175,6 +200,7 @@ const hasModal = Boolean(
           props.options.map((option) => {
             const optionType = option.type ?? "extra";
             const disabled = option.disabled ?? false;
+            const showCounter = option.showCounter ?? true;
             const constraint = optionConstraints[option.id] ?? {
               min: 0,
               max: null,
@@ -183,6 +209,19 @@ const hasModal = Boolean(
             };
             const quantity = constraint.quantity;
             const selected = quantity > 0;
+            const unitPrice =
+              typeof option.unitPrice === "number" ? option.unitPrice : null;
+            const priceSuffix = option.priceSuffix ?? "";
+            const priceFallback = option.price;
+            let dynamicPrice = priceFallback;
+            if (unitPrice !== null) {
+              dynamicPrice =
+                quantity > 0
+                  ? `${unitPrice * quantity}${priceSuffix}`
+                  : priceSuffix
+                    ? `0${priceSuffix}`
+                    : priceFallback;
+            }
             return (
               <div
                 class={styles.optionCard}
@@ -199,40 +238,51 @@ const hasModal = Boolean(
                     : undefined
                 }
                 data-step={constraint.step}
+                data-counter-enabled={showCounter ? "true" : "false"}
               >
-                <div class={styles.optionToggle} data-option-counter>
-                  <button
-                    type="button"
-                    class={`${styles.optionButton} ${styles.optionToggleMinus}`}
-                    data-option-decrement
-                    aria-label={`Réduire la quantité pour ${option.label}`}
-                    disabled={disabled || quantity <= constraint.min}
-                  >
-                    −
-                  </button>
-                  <span
-                    aria-live="polite"
-                    class={styles.optionToggleValue}
-                    data-option-value
-                  >
-                    {quantity}
-                  </span>
-                  <button
-                    type="button"
-                    class={`${styles.optionButton} ${styles.optionTogglePlus}`}
-                    data-option-increment
-                    aria-label={`Augmenter la quantité pour ${option.label}`}
-                    disabled={
-                      disabled ||
-                      (typeof constraint.max === "number" &&
-                        quantity >= constraint.max)
-                    }
-                  >
-                    +
-                  </button>
-                </div>
+                {showCounter && (
+                  <div class={styles.optionToggle} data-option-counter>
+                    <button
+                      type="button"
+                      class={`${styles.optionButton} ${styles.optionToggleMinus}`}
+                      data-option-decrement
+                      aria-label={`Réduire la quantité pour ${option.label}`}
+                      disabled={disabled || quantity <= constraint.min}
+                    >
+                      −
+                    </button>
+                    <span
+                      aria-live="polite"
+                      class={styles.optionToggleValue}
+                      data-option-value
+                    >
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      class={`${styles.optionButton} ${styles.optionTogglePlus}`}
+                      data-option-increment
+                      aria-label={`Augmenter la quantité pour ${option.label}`}
+                      disabled={
+                        disabled ||
+                        (typeof constraint.max === "number" &&
+                          quantity >= constraint.max)
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
                 <div class={styles.optionDetails}>
-                  <span class={styles.optionPrice}>{option.price}</span>
+                  <span
+                    class={styles.optionPrice}
+                    data-option-price
+                    data-unit-price={unitPrice !== null ? unitPrice : undefined}
+                    data-price-suffix={priceSuffix || undefined}
+                    data-price-fallback={priceFallback}
+                  >
+                    {dynamicPrice}
+                  </span>
                   <span class={styles.optionLabel}>{option.label}</span>
                   {option.description && (
                     <p class={styles.optionDescription}>{option.description}</p>
@@ -266,10 +316,14 @@ const hasModal = Boolean(
       <TarifModal
         id={modalId}
         fallbackTitle={props.modal?.title ?? "Plus d'informations"}
-        fallbackContent={props.modal?.content}
+        fallbackContent={modalSharedContent}
+        defaultPlan={resolvedDefaultPlan}
+        initialContent={initialPlanDetailContent}
+        defaultIcon={defaultPlanIcon ?? undefined}
+        defaultBadge={defaultPlanBadge ?? undefined}
       />
     )
   }
 </section>
 
-<script src="../Modals/TarifModal/tarifModal.client.ts"></script>
+<script src="./tarifs.client.ts"></script>

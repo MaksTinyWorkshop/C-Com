@@ -7,8 +7,7 @@ title: "Des écrans de diffusions variés, répondant à vos besoins publicitair
 
 description: "Affichez vos prochains événements, vos promotions ou encore une information utile avec rapidité"
 
-primaryCta:
-  label: "Envoyer un mail"
-  href: "mailto:contact@c-com.fr"
-
+ctas:
+  - label: "Envoyer un mail"
+    href: "mailto:contact@c-com.fr"
 ---

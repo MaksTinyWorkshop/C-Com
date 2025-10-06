@@ -14,10 +14,18 @@ const tarifsOptionSchema = z.object({
   type: z.enum(['base', 'video', 'extra']).default('extra'),
   defaultSelected: z.boolean().optional(),
   disabled: z.boolean().optional(),
+  defaultQuantity: z.number().optional(),
+  minQuantity: z.number().optional(),
+  maxQuantity: z.number().optional(),
+  step: z.number().optional(),
+  unitPrice: z.number().optional(),
+  priceSuffix: z.string().optional(),
+  showCounter: z.boolean().optional(),
 });
 
 const tarifsPlanSchema = z.object({
   slug: z.string(),
+  badge: z.string().optional(),
   icon: z.string().optional(),
   subtitle: z.string().optional(),
   price: z.string(),
@@ -52,9 +60,7 @@ const heroSchema = z.object({
       alt: z.string().optional(),
     })
     .optional(),
-  primaryCta: callToActionSchema.optional(),
-  secondaryCta: callToActionSchema.optional(),
-  tertiaryCta: callToActionSchema.optional(),
+  ctas: z.array(callToActionSchema).optional(),
 });
 
 const featureGridSchema = z.object({
@@ -133,8 +139,10 @@ const ctaSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   content: z.string().optional(),
-  primaryCta: callToActionSchema.optional(),
-  secondaryCta: callToActionSchema.optional(),
+  note: z.string().optional(),
+  ctas: z.array(callToActionSchema).optional(),
+  downloadName: z.string().optional(),
+  file: callToActionSchema.optional(),
 });
 
 const imagesSchema = z.object({

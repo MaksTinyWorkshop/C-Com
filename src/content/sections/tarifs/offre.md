@@ -10,10 +10,10 @@ plans:
     description: "Une offre essentielle pour diffuser un visuel créé par vos soins."
     moreInfoTitle: "Ce qui est inclus dans l'offre C'Simple"
     moreInfoContent: >-
+      <p class={styles.centered}>- Prérequis -</p>
       <ul>
-        <li>Diffusion de votre visuel statique sur le réseau sélectionné.</li>
-        <li>Mise à jour mensuelle des campagnes.</li>
-        <li>Accès à notre équipe support.</li>
+        <li>Vidéos ou visuels statiques fournis par le client dans le format requis par C'Com
+        </li>
       </ul>
   - slug: ccom
     icon: ccom-ccom
@@ -23,11 +23,13 @@ plans:
     description: "Nous créons pour vous un visuel percutant pour animer vos écrans."
     moreInfoTitle: "Ce qui est inclus dans l'offre C'Com"
     moreInfoContent: >-
-      <ul>
-        <li>Création d’un visuel statique de 10 secondes par notre studio.</li>
-        <li>Programmation et diffusion sur l’ensemble de vos écrans.</li>
-        <li>Suivi régulier et ajustements illimités.</li>
-      </ul>
+      <p class={styles.centered}>- Option disponible -</p>
+        <ul>
+          <li>
+          Création visuel statique (<span class={styles.bold}>150€ ht</span> par création produite par C'Com)
+          </li>
+        </ul>
+      
   - slug: cpro
     icon: ccom-cpro
     subtitle: "Tarif diffusion"
@@ -36,11 +38,18 @@ plans:
     description: "Une formule complète pour vos campagnes vidéo multi-formats."
     moreInfoTitle: "Ce qui est inclus dans l'offre C'Pro"
     moreInfoContent: >-
-      <ul>
-        <li>Création vidéo standard ou premium (drone / motion design).</li>
-        <li>Planification multi-écrans avec rapport d’impact.</li>
-        <li>Accompagnement personnalisé par un chargé de projet.</li>
-      </ul>
+      <p class={styles.centered}>- Options disponibles -</p>
+        <ul>
+          <li>
+          Création visuel statique (<span class={styles.bold}>150€ ht</span>/création produite par C'Com)
+          </li>
+          <li>
+          Création vidéo de 10 secondes par C'Com (<span class={styles.bold}>300€ ht</span> par création produite par C'Com)
+          </li>
+          <li>
+          Création d'une vidéo drone | motion design (<span class={styles.bold}>Sur devis</span> uniquement)
+          </li>
+        </ul>
 options:
   - id: static
     label: "Le visuel statique*"
@@ -48,19 +57,27 @@ options:
     price: "150€ ht / achat unique"
     type: base
     defaultSelected: true
+    defaultQuantity: 1
+    minQuantity: 1
+    unitPrice: 150
+    priceSuffix: "€ ht / achat unique"
   - id: video-standard
     label: "La vidéo standard*"
     description: "Vidéo de 10 secondes créée par C'Com"
     price: "300€ ht / achat unique"
     type: video
+    defaultQuantity: 0
+    minQuantity: 0
+    unitPrice: 300
+    priceSuffix: "€ ht / achat unique"
   - id: video-premium
     label: "Vidéo drone* / motion design*"
     description: "Production sur devis selon vos besoins"
     price: "Sur devis"
     type: video
+    showCounter: false
 modal:
   title: "+ d'infos"
   content: >-
-    <p>Chaque offre inclut l'installation, la programmation de vos campagnes et un suivi mensuel.</p>
-    <p>Vous bénéficiez d'un interlocuteur dédié pour définir les objectifs et ajuster vos contenus aux temps forts de votre communication.</p>
+    <p>Chaque offre comprend l'installation, la programmation et la modification de vos campagnes (tous les trimestres) ainsi que leur diffusion (par boucle de 10 secondes toutes les 5 minutes).</p>
 ---

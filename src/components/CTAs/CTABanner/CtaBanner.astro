@@ -14,15 +14,17 @@ interface Props {
   title: string;
   description?: string;
   content?: string;
-  primaryCta?: CallToAction;
-  secondaryCta?: CallToAction;
+  note?: string;
+  ctas?: CallToAction[];
 }
 
-const { eyebrow, title, description, content, primaryCta, secondaryCta } =
+const { eyebrow, title, description, content, ctas = [] } =
   Astro.props as Props;
-const resolvedSecondary = secondaryCta
-  ? { ...secondaryCta, href: resolveUrl(secondaryCta.href || "/") }
-  : undefined;
+const resolvedCtas = ctas.map((cta) => ({
+  ...cta,
+  href: resolveUrl(cta.href || "/"),
+}));
+const primaryCta = resolvedCtas[0];
 
 const resolvedClassName = () => {
   if (eyebrow === "devis") {
@@ -49,11 +51,8 @@ const resolvedClassName = () => {
           {description && <p set:html={description} />}
           {content && <p class={styles.bold} set:html={content} />}
         </div>
-        {resolvedSecondary && (
-          <CtaDevis
-            label={resolvedSecondary.label}
-            href={resolvedSecondary.href}
-          />
+        {primaryCta && (
+          <CtaDevis label={primaryCta.label} href={primaryCta.href} />
         )}
         <Spacer size=".5rem" />
       </div>

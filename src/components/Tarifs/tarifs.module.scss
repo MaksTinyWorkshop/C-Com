@@ -41,10 +41,25 @@
         .planBadge {
         display: inline-flex;
         align-items: center;
+        gap: var(--space-1);
 
           .planIcon {
           display: inline-flex;
           } 
+
+          .planBadgeText {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: var(--step--2);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: var(--color-secondary);
+            color: var(--color-primary);
+          }
         
         }
 
@@ -82,7 +97,8 @@
 .optionsBlock {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.5rem, 4vw, 2rem);
+  width: 100%;
+  gap: var(--space-3);
 }
 
 .optionsTitle {
@@ -95,12 +111,21 @@
 .optionStack {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.25rem, 3vw, 1.75rem);
+  gap: var(--space-3);
+
+  &:last-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
 }
 
 .optionCard {
   display: grid;
   grid-template-columns: auto 1fr;
+  width: 100%;
   gap: var(--space-1);
   align-items: center;
   padding: var(--space-1) var(--space-1);
@@ -121,10 +146,6 @@
     font-weight: 700;
     font-size: 1.35rem;
     transition: transform 0.2s ease;
-
-    &:is(:hover, :focus-within) {
-      transform: translateY(-2px);
-    }
 
     .optionButton {
       appearance: none;
@@ -183,12 +204,25 @@
     }
   }
 
+  &[data-counter-enabled="false"] {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+
+    .optionDetails {
+      width: 100%;
+      align-items: center;
+    }
+  }
 }
 
-
-
-
-
+.optionCard[data-counter-enabled="false"] .optionPrice,
+.optionCard[data-counter-enabled="false"] .optionLabel,
+.optionCard[data-counter-enabled="false"] .optionDescription {
+  width: 100%;
+  text-align: center;
+  display: block;
+}
 
 
 .actions {

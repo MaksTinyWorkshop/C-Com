@@ -2,6 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import CatalogueSection from '@components/Catalogue/CatalogueSection.astro';
 import CtaBanner from '@components/CTAs/CTABanner/CtaBanner.astro';
+import CtaDownload from '@components/CTAs/CTADownload/CtaDownload.astro';
 import FeatureGrid from '@components/FeatureGrid.astro';
 import HeroSection from '@components/Home/HeroSection.astro';
 import MarkdownSection from '@components/Markdown/MarkdownSection.astro';
@@ -29,15 +30,20 @@ const componentMap = {
 
 type SectionComponentName = keyof typeof componentMap;
 
+type SectionComponentResult =
+  | (typeof componentMap)[SectionComponentName]
+  | typeof CtaDownload;
+
 type ResolvedSection = {
-  Component: (typeof componentMap)[SectionComponentName];
+  Component: SectionComponentResult;
   props: any;
 };
 
 export async function resolveSection(
   section: CollectionEntry<'sections'>,
 ): Promise<ResolvedSection> {
-  const Component = componentMap[section.data.component as SectionComponentName];
+  const componentKey = section.data.component as SectionComponentName;
+  const Component = componentMap[componentKey];
 
   if (!Component) {
     throw new Error(`Section inconnue: ${section.id}`);
@@ -51,9 +57,7 @@ export async function resolveSection(
           eyebrow: section.data.eyebrow,
           title: section.data.title,
           content: section.data.content,
-          primaryCta: section.data.primaryCta,
-          secondaryCta: section.data.secondaryCta,
-          tertiaryCta: section.data.tertiaryCta,
+          ctas: section.data.ctas,
           image: section.data.image,
         },
       };
@@ -118,7 +122,22 @@ export async function resolveSection(
           embedUrl: section.data.embedUrl,
         },
       };
-    case 'cta':
+    case 'cta': {
+      if (section.data.file) {
+        return {
+          Component: CtaDownload,
+          props: {
+            eyebrow: section.data.eyebrow,
+            title: section.data.title,
+            content: section.data.content,
+            description: section.data.description,
+            note: section.data.note,
+            file: section.data.file,
+            downloadName: section.data.downloadName,
+          },
+        };
+      }
+
       return {
         Component,
         props: {
@@ -126,10 +145,11 @@ export async function resolveSection(
           title: section.data.title,
           description: section.data.description,
           content: section.data.content,
-          primaryCta: section.data.primaryCta,
-          secondaryCta: section.data.secondaryCta,
+          ctas: section.data.ctas,
+          note: section.data.note,
         },
       };
+    }
     case 'images':
       return {
         Component,

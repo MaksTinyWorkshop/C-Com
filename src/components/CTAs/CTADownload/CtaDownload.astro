@@ -1,0 +1,51 @@
+---
+import Icon from "@components/Icons/Icon.astro";
+import type { IconProps } from "@components/Icons/icon";
+import { resolveUrl, isExternalUrl } from "@lib/urlHelpers";
+import styles from "./ctaDownload.module.scss";
+
+interface CallToAction {
+  label: string;
+  href: string;
+  icon?: IconProps["type"];
+}
+
+interface Props {
+  title: string;
+  content?: string;
+  file: CallToAction;
+  downloadName?: string;
+}
+
+const { title, file, content, downloadName } = Astro.props as Props;
+
+const resolvedHref = resolveUrl(file.href);
+const resolvedImgUrl = content ? resolveUrl(content) : null;
+const externalLink = isExternalUrl(file.href);
+const sanitizedHref = file.href?.split("#")[0]?.split("?")[0] ?? file.href;
+const derivedDownloadName =
+  downloadName ?? sanitizedHref.split("/").filter(Boolean).pop();
+const downloadAttr = !externalLink ? (derivedDownloadName ?? "") : undefined;
+---
+
+<section class={`${styles.downloadCta} section-container`}>
+  <div class={styles.shell}>
+    <div class={styles.content}>
+      {
+        resolvedImgUrl && (
+          <img src={resolvedImgUrl} alt={file.label} class={styles.visual} />
+        )
+      }
+
+      <a
+        class={styles.action}
+        href={resolvedHref}
+        target={externalLink ? "_blank" : undefined}
+        rel={externalLink ? "noopener noreferrer" : undefined}
+        download={downloadAttr}
+      >
+        <span class={styles.actionLabel}>{title}</span>
+      </a>
+    </div>
+  </div>
+</section>
