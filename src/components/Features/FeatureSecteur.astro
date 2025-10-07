@@ -1,29 +1,22 @@
 ---
 import Icon from "@components/Icons/Icon.astro";
+import SectionHeader from "@components/UI/SectionHeader.astro";
 import Spacer from "@components/UI/Spacer.astro";
+import type { FeatureSectionProps } from "@types/features";
 
-interface FeatureItem {
-  title: string;
-  description: string;
-  icon?: string;
-}
-
-interface Props {
-  eyebrow?: string;
-  title: string;
-  description?: string;
-  features: FeatureItem[];
-}
-
-const { eyebrow, title, description, features } = Astro.props as Props;
+const { eyebrow, title, description, features } =
+  Astro.props as FeatureSectionProps;
 ---
 
 <section class="section-container">
-  <div class="intro">
-    {eyebrow && <span class="eyebrow">{eyebrow}</span>}
-    <h2>{title}</h2>
-    {description && <p>{description}</p>}
-  </div>
+  <SectionHeader
+    class="intro"
+    eyebrow={eyebrow}
+    title={title}
+    description={description}
+    headingLevel="h1"
+    as="header"
+  />
   <div class="features">
     {
       features.map((feature) => (
@@ -44,11 +37,13 @@ const { eyebrow, title, description, features } = Astro.props as Props;
   .intro {
     margin: 0 auto;
     text-align: center;
-    h2 {
+
+    &__title {
       margin: var(--space-2) 0 var(--space-5);
-      color: var(--color-primary);
+      color: var(--color-secondary);
       font-size: var(--step-2);
       font-weight: 800;
+      text-transform: none;
     }
   }
   .features {

@@ -1,21 +1,9 @@
 ---
 import Icon from "@components/Icons/Icon.astro";
 import Spacer from "@components/UI/Spacer.astro";
+import type { FeatureTarifProps } from "@types/features";
 
-interface FeatureItem {
-  title: string;
-  description: string;
-  icon?: string;
-}
-
-interface Props {
-  eyebrow?: string;
-  title: string;
-  description?: string;
-  features: FeatureItem[];
-}
-
-const { features } = Astro.props as Props;
+const { features } = Astro.props as FeatureTarifProps;
 ---
 
 <section class="section-container tarifs">

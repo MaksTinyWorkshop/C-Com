@@ -7,6 +7,7 @@ import FeatureGrid from '@components/Features/FeatureSecteur.astro';
 import FeatureTarif from '@components/Features/FeatureTarif.astro';
 import HeroSection from '@components/Home/HeroSection.astro';
 import MarkdownSection from '@components/Markdown/MarkdownSection.astro';
+import ContactFormSection from '@components/Form/ContactFormSection.astro';
 import Tarifs from '@components/Tarifs/Tarifs.astro';
 import FAQSection from '@components/FAQSection.astro';
 import ParcoursSection from '@components/ParcoursSection.astro';
@@ -21,6 +22,7 @@ const componentMap = {
   parcours: ParcoursSection,
   tarifs: Tarifs,
   faq: FAQSection,
+  'contact-form': ContactFormSection,
   markdown: MarkdownSection,
   map: MapSection,
   cta: CtaBanner,
@@ -112,6 +114,19 @@ export async function resolveSection(
           title: section.data.title,
           description: section.data.description,
           questions: section.data.questions,
+        },
+      };
+    case 'contact-form':
+      return {
+        Component,
+        props: {
+          title: section.data.title,
+          subtitle: section.data.subtitle,
+          highlights: section.data.highlights,
+          formulas: section.data.formulas,
+          defaultFormula: section.data.defaultFormula,
+          submitLabel: section.data.submitLabel,
+          successMessage: section.data.successMessage,
         },
       };
     case 'markdown': {

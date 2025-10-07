@@ -1,17 +1,8 @@
 ---
 import { resolveUrl } from "@lib/urlHelpers";
+import type { ImagesGridProps } from "@types/images";
 
-interface ImageItem {
-  src: string;
-  alt?: string;
-  caption?: string;
-}
-
-interface Props {
-  images: ImageItem[];
-}
-
-const { images } = Astro.props as Props;
+const { images } = Astro.props as ImagesGridProps;
 const resolvedImages = images.map((image) => ({
   ...image,
   src: resolveUrl(image.src),

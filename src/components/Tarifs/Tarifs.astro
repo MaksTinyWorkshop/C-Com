@@ -1,67 +1,24 @@
 ---
 import Icon from "@components/Icons/Icon.astro";
-import type { IconProps } from "@components/Icons/icon";
 import TarifModal from "@components/Modals/TarifModal/TarifModal.astro";
 import modalStyles from "@components/Modals/TarifModal/tarifModal.module.scss";
+import { replaceScopedClasses } from "@lib/htmlUtils";
+import type {
+  ModalContent,
+  Option,
+  OptionConstraint,
+  Plan,
+  PlanConfig,
+  TarifClientConfig,
+  TarifsSectionProps,
+} from "@types/tarifs";
 import styles from "./tarifs.module.scss";
 
-export interface Plan {
-  slug: string;
-  badge?: string;
-  icon?: IconProps["type"];
-  subtitle?: string;
-  price: string;
-  footnote?: string;
-  description?: string;
-  moreInfoTitle?: string;
-  moreInfoContent?: string;
-}
-
-export interface Option {
-  id: string;
-  label: string;
-  description?: string;
-  price: string;
-  type?: "base" | "video" | "extra";
-  defaultSelected?: boolean;
-  disabled?: boolean;
-  defaultQuantity?: number;
-  minQuantity?: number;
-  maxQuantity?: number;
-  step?: number;
-  unitPrice?: number;
-  priceSuffix?: string;
-  showCounter?: boolean;
-}
-
-export interface ModalContent {
-  title?: string;
-  content?: string;
-}
-
-type OptionConstraintConfig = {
-  min: number;
-  max: number | null;
-  step: number;
+type OptionConstraintConfig = OptionConstraint & {
   quantity: number;
 };
 
-interface Props {
-  defaultPlan: string;
-  plans: Plan[];
-  options: Option[];
-  modal?: ModalContent;
-}
-
-const props = Astro.props as Props;
-
-const replaceModalScopedClasses = (input?: string | null) => {
-  if (!input) return input ?? null;
-  return input.replace(/\{styles\.([\w-]+)\}/g, (_, token) => {
-    const resolved = modalStyles[token as keyof typeof modalStyles];
-    return typeof resolved === "string" ? resolved : token;
-  });
-};
+const props = Astro.props as TarifsSectionProps;
 
 const planEntries = props.plans ?? [];
 const planMap = new Map(planEntries.map((plan) => [plan.slug, plan]));
@@ -114,35 +71,38 @@ const defaultPlanEntry = planMap.get(resolvedDefaultPlan);
 const defaultPlanIcon = defaultPlanEntry?.icon ?? null;
 const defaultPlanBadge = defaultPlanEntry?.badge ?? null;
 
-const modalSharedContent = replaceModalScopedClasses(props.modal?.content ?? "") ?? "";
+const modalSharedContent =
+  replaceScopedClasses(props.modal?.content ?? "", modalStyles) ?? "";
 const initialPlanDetailContent =
-  replaceModalScopedClasses(defaultPlanEntry?.moreInfoContent ?? "") ?? "";
-const configPayload = encodeURIComponent(
-  JSON.stringify({
-    defaultPlan: resolvedDefaultPlan,
-    baseOptionIds,
-    videoOptionIds,
-    optionQuantities,
-    optionConstraints: Object.fromEntries(
-      Object.entries(optionConstraints).map(([id, constraint]) => [
-        id,
-        {
-          min: constraint.min,
-          max: constraint.max,
-          step: constraint.step,
-        },
-      ])
-    ),
-    plans: planEntries.map((plan) => ({
-      slug: plan.slug,
-      badge: plan.badge ?? null,
-      moreInfoTitle: plan.moreInfoTitle ?? null,
-      moreInfoContent:
-        replaceModalScopedClasses(plan.moreInfoContent ?? null) ?? null,
-    })),
-    modal: props.modal ?? null,
-  })
-);
+  replaceScopedClasses(defaultPlanEntry?.moreInfoContent ?? "", modalStyles) ??
+  "";
+
+const clientConfig: TarifClientConfig = {
+  defaultPlan: resolvedDefaultPlan,
+  baseOptionIds,
+  videoOptionIds,
+  optionQuantities,
+  optionConstraints: Object.fromEntries(
+    Object.entries(optionConstraints).map(([id, constraint]) => [
+      id,
+      {
+        min: constraint.min,
+        max: constraint.max,
+        step: constraint.step,
+      },
+    ]),
+  ),
+  plans: planEntries.map<PlanConfig>((plan) => ({
+    slug: plan.slug,
+    badge: plan.badge ?? null,
+    moreInfoTitle: plan.moreInfoTitle ?? null,
+    moreInfoContent:
+      replaceScopedClasses(plan.moreInfoContent ?? null, modalStyles) ?? null,
+  })),
+  modal: props.modal ?? null,
+};
+
+const configPayload = encodeURIComponent(JSON.stringify(clientConfig));
 
 const hasModal = Boolean(
   props.modal || planEntries.some((plan) => plan.moreInfoContent)
@@ -297,7 +257,14 @@ const hasModal = Boolean(
   </div>
 
   <div class={styles.actions}>
-    <a class={styles.ctaPrimary} href="/devis">Demander un devis</a>
+    <a
+      class={styles.ctaPrimary}
+      href="/contact"
+      data-tarifs-contact
+      data-base-href="/contact"
+    >
+      Demander un devis
+    </a>
     {
       hasModal && (
         <button

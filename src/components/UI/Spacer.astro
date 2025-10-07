@@ -1,14 +1,5 @@
 ---
-type Axis = "vertical" | "horizontal";
-
-interface Props {
-  size?: number | string;
-  axis?: Axis;
-  inline?: boolean;
-  class?: string;
-  style?: string;
-  ariaHidden?: boolean;
-}
+import type { SpacerProps } from "@types/ui";
 
 const {
   size = "1rem",
@@ -18,7 +9,7 @@ const {
   style = "",
   ariaHidden = true,
   ...rest
-} = Astro.props as Props & Record<string, unknown>;
+} = Astro.props as SpacerProps;
 
 const sizeValue = typeof size === "number" ? `${size}px` : size;
 

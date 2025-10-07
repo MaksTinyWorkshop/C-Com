@@ -1,11 +1,8 @@
+import type { CallbackPayload } from "@types/contact";
+
 const MODAL_ROOT_SELECTOR = "[data-callback-modal-root]";
 const TRIGGER_SELECTOR = "[data-callback-trigger]";
 const CALLBACK_ENDPOINT = import.meta.env.PUBLIC_CALLBACK_ENDPOINT;
-
-interface CallbackPayload {
-  name: string;
-  phone: string;
-}
 
 let openModalHandler: (() => void) | null = null;
 let closeModalHandler: (() => void) | null = null;

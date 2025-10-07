@@ -7,7 +7,8 @@
       "@layouts/*": ["src/layouts/*"],
       "@lib/*": ["src/lib/*"],
       "@styles/*": ["src/styles/*"],
-      "@content/*": ["src/content/*"]
+      "@content/*": ["src/content/*"],
+      "@types/*": ["src/types/*"]
     }
   }
 }

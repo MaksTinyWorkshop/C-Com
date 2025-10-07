@@ -111,6 +111,53 @@ const faqSchema = z.object({
     .min(1),
 });
 
+const contactFormFieldSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  placeholder: z.string().optional(),
+  type: z
+    .enum(['text', 'email', 'tel', 'number', 'textarea', 'select'])
+    .default('text'),
+  required: z.boolean().default(true),
+  min: z.number().optional(),
+  max: z.number().optional(),
+  step: z.number().optional(),
+  options: z
+    .array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+      }),
+    )
+    .optional(),
+});
+
+const contactFormFormulaSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  description: z.string().optional(),
+  helper: z.string().optional(),
+  fields: z.array(contactFormFieldSchema).min(1),
+  submitLabel: z.string().optional(),
+});
+
+const contactFormHighlightSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  targetFormula: z.string().optional(),
+});
+
+const contactFormSchema = z.object({
+  component: z.literal('contact-form'),
+  title: z.string(),
+  subtitle: z.string().optional(),
+  highlights: z.array(contactFormHighlightSchema).optional(),
+  formulas: z.array(contactFormFormulaSchema).min(1),
+  defaultFormula: z.string().optional(),
+  submitLabel: z.string().optional(),
+  successMessage: z.string().optional(),
+});
+
 const markdownSchema = z.object({
   component: z.literal('markdown'),
   title: z.string().optional(),
@@ -211,6 +258,7 @@ const sectionSchema = z.discriminatedUnion('component', [
   featureGridSchema,
   parcoursSchema,
   faqSchema,
+  contactFormSchema,
   markdownSchema,
   mapSchema,
   ctaSchema,

@@ -1,11 +1,7 @@
 ---
-interface Props {
-  title?: string;
-  caption?: string;
-  embedUrl: string;
-}
+import type { MapSectionProps } from "@types/map";
 
-const { title, caption, embedUrl } = Astro.props as Props;
+const { title, caption, embedUrl } = Astro.props as MapSectionProps;
 ---
 
 <section class="section-container map-section">

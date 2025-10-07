@@ -1,0 +1,22 @@
+---
+import type { SectionHeaderProps } from "@types/section";
+
+const {
+  title,
+  description,
+  eyebrow,
+  class: className,
+  headingLevel = "h2",
+  as = "div",
+} = Astro.props as SectionHeaderProps;
+
+const resolvedClass = ["section-header", className].filter(Boolean).join(" ");
+---
+
+<component is={as} class={className}>
+  {eyebrow && <span class={`${className}__eyebrow`}>{eyebrow}</span>}
+  <component is={headingLevel} class={`${className}__title`}>
+    {title}
+  </component>
+  {description && <p class={`${className}__description`}>{description}</p>}
+</component>

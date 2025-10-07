@@ -1,25 +1,13 @@
 ---
-interface Question {
-  question: string;
-  answer: string;
-  role?: string;
-}
-
-interface Props {
-  title: string;
-  description?: string;
-  questions: Question[];
-}
-
-const { title, description, questions } = Astro.props as Props;
+import SectionHeader from "@components/UI/SectionHeader.astro";
 import Spacer from "./UI/Spacer.astro";
+import type { FAQSectionProps } from "@types/faq";
+
+const { title, description, questions } = Astro.props as FAQSectionProps;
 ---
 
 <section class="section-container questions">
-  <div class="intro">
-    <h2>{title}</h2>
-    {description && <p>{description}</p>}
-  </div>
+  <SectionHeader class="intro" title={title} description={description} />
   <div class="faq-accordion">
     {
       questions.map(({ question, answer }) => (

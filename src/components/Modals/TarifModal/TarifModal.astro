@@ -1,17 +1,9 @@
 ---
 import Icon from "@components/Icons/Icon.astro";
 import type { IconProps } from "@components/Icons/icon";
+import { replaceScopedClasses } from "@lib/htmlUtils";
+import type { TarifModalProps } from "@types/tarifs";
 import styles from "./tarifModal.module.scss";
-
-interface Props {
-  id: string;
-  fallbackTitle: string;
-  fallbackContent?: string;
-  defaultPlan: string;
-  initialContent?: string;
-  defaultIcon?: IconProps["type"] | null;
-  defaultBadge?: string | null;
-}
 
 const {
   id,
@@ -21,18 +13,10 @@ const {
   initialContent,
   defaultIcon = null,
   defaultBadge = null,
-} = Astro.props as Props;
+} = Astro.props as TarifModalProps & { defaultIcon?: IconProps["type"] | null };
 
-const replaceScopedClasses = (input?: string | null) => {
-  if (!input) return "";
-  return input.replace(/\{styles\.([\w-]+)\}/g, (_, token) => {
-    const resolved = styles[token as keyof typeof styles];
-    return typeof resolved === "string" ? resolved : token;
-  });
-};
-
-const processedFallbackContent = replaceScopedClasses(fallbackContent);
-const processedInitialContent = replaceScopedClasses(initialContent);
+const processedFallbackContent = replaceScopedClasses(fallbackContent, styles) ?? "";
+const processedInitialContent = replaceScopedClasses(initialContent, styles) ?? "";
 
 const trimmedInitialContent = processedInitialContent.trim()
   ? processedInitialContent

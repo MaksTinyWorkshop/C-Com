@@ -1,3 +1,10 @@
+import type {
+  OptionConstraint,
+  PlanConfig,
+  PlanDetailPayload,
+  TarifClientConfig,
+} from "@types/tarifs";
+
 const ROOT_SELECTOR = "[data-tarifs-root]";
 const PLAN_CARD_SELECTOR = "[data-plan-card]";
 const OPTION_CARD_SELECTOR = "[data-option-card]";
@@ -5,38 +12,10 @@ const OPTION_VALUE_SELECTOR = "[data-option-value]";
 const OPTION_DECREMENT_SELECTOR = "[data-option-decrement]";
 const OPTION_INCREMENT_SELECTOR = "[data-option-increment]";
 const MODAL_TRIGGER_SELECTOR = "[data-tarif-modal-trigger]";
+const CONTACT_LINK_SELECTOR = "[data-tarifs-contact]";
 
 const PLAN_CHANGE_EVENT = "tarif:plan-change";
 const MODAL_OPEN_EVENT = "tarif:modal-open";
-
-interface PlanConfig {
-  slug: string;
-  badge: string | null;
-  moreInfoTitle: string | null;
-  moreInfoContent: string | null;
-}
-
-interface OptionConstraint {
-  min: number;
-  max: number | null;
-  step: number;
-}
-
-interface TarifConfig {
-  defaultPlan: string;
-  baseOptionIds: string[];
-  videoOptionIds: string[];
-  optionQuantities: Record<string, number>;
-  optionConstraints: Record<string, OptionConstraint>;
-  plans: PlanConfig[];
-}
-
-interface PlanDetailPayload {
-  slug: string;
-  badge: string | null;
-  moreInfoTitle: string | null;
-  moreInfoContent: string | null;
-}
 
 const clampQuantity = (value: number, min: number, max: number | null) => {
   const upper = typeof max === "number" ? max : Number.POSITIVE_INFINITY;
@@ -46,10 +25,12 @@ const clampQuantity = (value: number, min: number, max: number | null) => {
   return Math.min(Math.max(value, min), upper);
 };
 
-const decodeConfig = (value: string | null | undefined): TarifConfig | null => {
+const decodeConfig = (
+  value: string | null | undefined,
+): TarifClientConfig | null => {
   if (!value) return null;
   try {
-    return JSON.parse(decodeURIComponent(value)) as TarifConfig;
+    return JSON.parse(decodeURIComponent(value)) as TarifClientConfig;
   } catch (error) {
     console.warn("Impossible d'analyser la configuration des tarifs", error);
     return null;
@@ -143,6 +124,9 @@ const initialiseRoot = (root: HTMLElement) => {
   const optionCards = Array.from(
     root.querySelectorAll<HTMLElement>(OPTION_CARD_SELECTOR)
   );
+  const contactLink = root.querySelector<HTMLAnchorElement>(CONTACT_LINK_SELECTOR);
+  const baseContactHref =
+    contactLink?.dataset.baseHref || contactLink?.getAttribute("href") || "/contact";
   const planDetails = new Map<string, PlanConfig>(
     (config.plans || []).map((plan) => [plan.slug, plan])
   );
@@ -174,6 +158,42 @@ const initialiseRoot = (root: HTMLElement) => {
 
   const quantityForCard = (card: HTMLElement) =>
     Number(card.dataset.quantity ?? "0") || 0;
+
+  const countByType = (type: string) =>
+    optionCards
+      .filter((card) => card.dataset.optionType === type)
+      .reduce((total, card) => total + quantityForCard(card), 0);
+
+  const updateContactLink = (slug: string) => {
+    if (!contactLink) return;
+
+    const url = new URL(baseContactHref, window.location.origin);
+    const params = new URLSearchParams(url.search);
+
+    if (slug) {
+      params.set("formula", slug);
+    } else {
+      params.delete("formula");
+    }
+
+    const visuals = countByType("base");
+    const videos = countByType("video");
+
+    if (visuals > 0) {
+      params.set("visuals", String(visuals));
+    } else {
+      params.delete("visuals");
+    }
+
+    if (videos > 0) {
+      params.set("videos", String(videos));
+    } else {
+      params.delete("videos");
+    }
+
+    url.search = params.toString();
+    contactLink.href = `${url.pathname}${url.search}`;
+  };
 
   const getPlanDetail = (slug: string): PlanDetailPayload => {
     const plan = planDetails.get(slug);
@@ -224,6 +244,7 @@ const initialiseRoot = (root: HTMLElement) => {
     });
 
     dispatchPlanChange(slug);
+    updateContactLink(slug);
     return slug;
   };
 

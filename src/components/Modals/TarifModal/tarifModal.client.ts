@@ -1,3 +1,5 @@
+import type { PlanDetailPayload } from "@types/tarifs";
+
 const MODAL_SELECTOR = "[data-tarif-modal-root]";
 const ICON_SELECTOR = "[data-modal-icon]";
 const TITLE_SELECTOR = "[data-modal-title]";
@@ -6,13 +8,6 @@ const CLOSE_SELECTOR = "[data-modal-close]";
 
 const PLAN_CHANGE_EVENT = "tarif:plan-change";
 const MODAL_OPEN_EVENT = "tarif:modal-open";
-
-interface PlanDetailPayload {
-  slug: string;
-  badge: string | null;
-  moreInfoTitle: string | null;
-  moreInfoContent: string | null;
-}
 
 const EMPTY_PLAN_CONTENT =
   "<p>Aucune information complémentaire pour le moment.</p>";

@@ -3,31 +3,14 @@ import type { CollectionEntry } from "astro:content";
 import { resolveUrl } from "@lib/urlHelpers";
 import Spacer from "@components/UI/Spacer.astro";
 import styles from "./markdownSection.module.scss";
+import type { MarkdownSectionProps } from "@types/markdown";
 
 type MarkdownRender = Awaited<
   ReturnType<CollectionEntry<"sections">["render"]>
 >;
 
-interface Images {
-  src: string;
-  alt?: string;
-  caption?: string;
-}
-interface Props {
-  title?: string;
-  description?: string;
-  images?: Images[];
-  variant?: string;
-  Content: MarkdownRender["Content"];
-}
-
-const {
-  title,
-  description,
-  images,
-  variant = "",
-  Content,
-} = Astro.props as Props;
+const { title, description, images, variant = "", Content } =
+  Astro.props as MarkdownSectionProps<MarkdownRender["Content"]>;
 
 const sectionClass = [
   "section-container",

@@ -1,20 +1,9 @@
 ---
 import Icon from "./Icons/Icon.astro";
 import Spacer from "./UI/Spacer.astro";
+import type { ParcoursSectionProps } from "@types/parcours";
 
-interface Step {
-  title: string;
-  description: string;
-  icon?: string;
-}
-
-type Props = {
-  title: string;
-  description?: string;
-  steps: Step[];
-};
-
-const { title, description, steps } = Astro.props as Props;
+const { title, description, steps } = Astro.props as ParcoursSectionProps;
 ---
 
 <section class="section-container parcours">

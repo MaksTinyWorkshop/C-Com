@@ -4,33 +4,11 @@ import { Tabs } from "webcoreui/astro";
 
 import styles from "./catalogue.module.scss";
 import { resolveUrl } from "@lib/urlHelpers";
-
-interface CatalogueLink {
-  label: string;
-  href: string;
-}
-
-interface CatalogueImage {
-  src: string;
-  alt?: string;
-}
-
-interface CatalogueItem {
-  title: string;
-  reference?: string;
-  description?: string;
-  price?: string;
-  image?: CatalogueImage;
-  cta?: CatalogueLink;
-}
-
-interface CatalogueCategory {
-  id: string;
-  label: string;
-  description?: string;
-  note?: string;
-  items: CatalogueItem[];
-}
+import type {
+  CatalogueCategory,
+  CatalogueItem,
+  CatalogueSectionProps,
+} from "@types/catalogue";
 
 type ProcessedItem = CatalogueItem & {
   descriptionHtml: string | null;
@@ -44,15 +22,6 @@ type ProcessedCategory = CatalogueCategory & {
   items: ProcessedItem[];
 };
 
-interface Props {
-  eyebrow?: string;
-  title?: string;
-  intro?: string;
-  categories?: CatalogueCategory[];
-  defaultCategory?: string;
-  footnote?: string;
-}
-
 const {
   eyebrow,
   title,
@@ -60,7 +29,7 @@ const {
   categories = [],
   defaultCategory,
   footnote,
-} = Astro.props as Props;
+} = Astro.props as CatalogueSectionProps;
 
 const validCategories = categories.filter(
   (category) =>

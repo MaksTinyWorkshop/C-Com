@@ -1,26 +1,14 @@
 ---
 import Spacer from "./UI/Spacer.astro";
+import SectionHeader from "@components/UI/SectionHeader.astro";
+import type { TestimonialsSectionProps } from "@types/testimonials";
 
-interface Testimonial {
-  quote: string;
-  author: string;
-  role?: string;
-}
-
-interface Props {
-  title: string;
-  description?: string;
-  testimonials: Testimonial[];
-}
-
-const { title, description, testimonials } = Astro.props as Props;
+const { title, description, testimonials } =
+  Astro.props as TestimonialsSectionProps;
 ---
 
 <section class="section-container testimonials">
-  <div class="intro">
-    <h2>{title}</h2>
-    {description && <p>{description}</p>}
-  </div>
+  <SectionHeader class="intro" title={title} description={description} />
   <div class="testimonials__grid">
     {
       testimonials.map((item) => (

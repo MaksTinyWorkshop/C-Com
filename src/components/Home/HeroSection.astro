@@ -2,30 +2,10 @@
 import { resolveUrl } from "@lib/urlHelpers";
 import CtaDevis from "@components/CTAs/CTADevis/CtaDevis.astro";
 
-interface CallToAction {
-  label: string;
-  href: string;
-  icon?: string;
-}
+import type { HeroProps } from "@types/hero";
 
-interface Props {
-  eyebrow?: string;
-  title: string;
-  content: string;
-  ctas?: CallToAction[];
-  image?: {
-    src: string;
-    alt?: string;
-  };
-}
-
-const {
-  eyebrow,
-  title,
-  content,
-  ctas = [],
-  image,
-} = Astro.props as Props;
+const { eyebrow, title, content, ctas = [], image } =
+  Astro.props as HeroProps;
 
 const ctaCards = ctas.map((cta) => ({
   ...cta,

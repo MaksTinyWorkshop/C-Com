@@ -1,0 +1,285 @@
+---
+import Icon from "@components/Icons/Icon.astro";
+import "./form.module.scss";
+import {
+  buildFormGroups,
+  type FormGroupConfig,
+  type BuildGroupOptions,
+} from "./formLayout";
+import type {
+  ContactFormSectionProps,
+  FormField,
+  FormFormula,
+} from "@types/form";
+
+const {
+  title,
+  subtitle,
+  formulas,
+  defaultFormula,
+  submitLabel = "Envoyer",
+  successMessage = "Votre message a bien été transmis. Nous revenons vers vous rapidement.",
+  groupLayout,
+  includeRemainingFields,
+  remainingGroupTitle,
+} = Astro.props as ContactFormSectionProps;
+
+const initialFormula =
+  (defaultFormula && formulas.some((item) => item.id === defaultFormula)
+    ? defaultFormula
+    : undefined) ?? formulas[0]?.id;
+
+const formatPlaceholder = (field: FormField, isRequired: boolean) =>
+  field.placeholder ?? `${field.label}${isRequired ? "*" : ""}`;
+---
+
+{
+  formulas.length === 0 ? (
+    <section class="contact-section">
+      <div class="contact-container">
+        <div class="contact-header">
+          <h1>{title}</h1>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+        <p class="contact-error">
+          Aucun formulaire n’est configuré pour le moment.
+        </p>
+      </div>
+    </section>
+  ) : (
+    <section class="contact-section" data-contact-section>
+      <div class="contact-container">
+        <div class="contact-header">
+          <h1>{title}</h1>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+
+        <div class="form-card">
+          <div class="form-header">
+            <span class="form-header-label">Formule</span>
+            <div class="select-wrapper">
+              <select
+                name="formula"
+                aria-label="Choisir une formule"
+                data-contact-select
+              >
+                {formulas.map((formula) => (
+                  <option
+                    value={formula.id}
+                    selected={formula.id === initialFormula}
+                  >
+                    {formula.label}
+                  </option>
+                ))}
+              </select>
+              <span class="select-icon">
+                <Icon type="chevron-down" size={18} />
+              </span>
+            </div>
+          </div>
+
+          {formulas.map((formula) => {
+            const renderField = (field: FormField) => {
+              const fieldId = `contact-${formula.id}-${field.id}`;
+              const fieldType = field.type ?? "text";
+              const isRequired = field.required !== false;
+              const placeholder = formatPlaceholder(field, isRequired);
+
+              const isNumberField = fieldType === "number";
+              const fieldClass = `form-field${isNumberField ? " form-field--number" : ""}`;
+              const labelClass = isNumberField ? "form-label" : "visually-hidden";
+
+              switch (fieldType) {
+                case "textarea":
+                  return (
+                    <div class={fieldClass}>
+                      <label class={labelClass} for={fieldId}>
+                        {field.label}
+                        {isRequired ? "*" : ""}
+                      </label>
+                      <textarea
+                        id={fieldId}
+                        name={field.id}
+                        placeholder={placeholder}
+                        required={isRequired}
+                      />
+                    </div>
+                  );
+                case "select":
+                  return (
+                    <div class={fieldClass}>
+                      <label class={labelClass} for={fieldId}>
+                        {field.label}
+                        {isRequired ? "*" : ""}
+                      </label>
+                      <div class="field-select">
+                        <select id={fieldId} name={field.id} required={isRequired}>
+                          <option value="" disabled selected>
+                            {placeholder}
+                          </option>
+                          {field.options?.map((option) => (
+                            <option value={option.value}>{option.label}</option>
+                          ))}
+                        </select>
+                        <span class="select-icon">
+                          <Icon type="chevron-down" size={16} />
+                        </span>
+                      </div>
+                    </div>
+                  );
+                case "number": {
+                  const minAttr =
+                    typeof field.min === "number" && Number.isFinite(field.min)
+                      ? String(field.min)
+                      : undefined;
+                  const maxAttr =
+                    typeof field.max === "number" && Number.isFinite(field.max)
+                      ? String(field.max)
+                      : undefined;
+                  const stepAttr =
+                    typeof field.step === "number" && field.step > 0
+                      ? String(field.step)
+                      : undefined;
+
+                  return (
+                    <div class={fieldClass}>
+                      <label class={labelClass} for={fieldId}>
+                        {field.label}
+                        {isRequired ? "*" : ""}
+                      </label>
+                      <div
+                        class="number-field"
+                        data-number-field
+                        data-field-name={field.id}
+                        data-min={minAttr}
+                        data-max={maxAttr}
+                        data-step={stepAttr}
+                      >
+                        <button
+                          type="button"
+                          class="number-button number-button--minus"
+                          data-stepper-decrement
+                          aria-label={`Diminuer ${field.label}`}
+                        >
+                          <span aria-hidden="true">−</span>
+                        </button>
+                        <input
+                          id={fieldId}
+                          type="number"
+                          name={field.id}
+                          inputmode="numeric"
+                          min={minAttr}
+                          max={maxAttr}
+                          step={stepAttr}
+                          placeholder={placeholder}
+                          required={isRequired}
+                        />
+                        <button
+                          type="button"
+                          class="number-button number-button--plus"
+                          data-stepper-increment
+                          aria-label={`Augmenter ${field.label}`}
+                        >
+                          <span aria-hidden="true">+</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+                default:
+                  return (
+                    <div class={fieldClass}>
+                      <label class={labelClass} for={fieldId}>
+                        {field.label}
+                        {isRequired ? "*" : ""}
+                      </label>
+                      <input
+                        id={fieldId}
+                        type={fieldType}
+                        name={field.id}
+                        placeholder={placeholder}
+                        required={isRequired}
+                      />
+                    </div>
+                  );
+              }
+            };
+
+            const renderRow = (fields: FormField[]) => {
+              if (fields.length === 0) return null;
+              const isDouble = fields.length === 2;
+              return (
+                <div class={`field-row${isDouble ? " field-row--double" : ""}`}>
+                  {fields.map((field) => renderField(field))}
+                </div>
+              );
+            };
+
+            const groupOptions: BuildGroupOptions = {};
+            if (groupLayout) {
+              groupOptions.layout = groupLayout;
+            }
+            if (typeof includeRemainingFields === "boolean") {
+              groupOptions.includeRemainingFields = includeRemainingFields;
+            }
+            if (remainingGroupTitle) {
+              groupOptions.remainingGroupTitle = remainingGroupTitle;
+            }
+
+            const groups = buildFormGroups(formula.fields, groupOptions);
+
+            return (
+              <form
+                class={`contact-form${
+                  formula.id === initialFormula ? " is-active" : ""
+                }`}
+                data-formula-fields
+                data-formula={formula.id}
+                method="post"
+              >
+                <div class="form-copy">
+                  <h2 class="form-title">{formula.label}</h2>
+                  {formula.description && (
+                    <p class="form-description">{formula.description}</p>
+                  )}
+                  {formula.helper && (
+                    <p class="form-helper">{formula.helper}</p>
+                  )}
+                </div>
+
+                <div class="form-groups">
+                  {groups.map(({ title, rows }) => {
+                    const renderedRows = rows
+                      .map((row) => renderRow(row))
+                      .filter(Boolean);
+
+                    if (renderedRows.length === 0) return null;
+
+                    return (
+                      <section class="form-group">
+                        <h3 class="form-group-title">{title}</h3>
+                        <div class="form-group-body">{renderedRows}</div>
+                      </section>
+                    );
+                  })}
+                </div>
+
+                <div class="form-footer">
+                  <p class="form-note">* Champs obligatoires</p>
+                  <button class="submit-button" type="submit">
+                    {formula.submitLabel ?? submitLabel}
+                  </button>
+                </div>
+
+                <p class="form-success" role="status" hidden>
+                  {successMessage}
+                </p>
+              </form>
+            );
+          })}
+        </div>
+      </div>
+      <script src="./form.client.ts" />
+    </section>
+  )
+}
