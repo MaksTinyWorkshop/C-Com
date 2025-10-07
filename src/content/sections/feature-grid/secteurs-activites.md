@@ -1,5 +1,6 @@
 ---
 component: feature-grid
+key: "secteurs-activites"
 eyebrow: ""
 title: "Secteurs d'activité"
 description: ""

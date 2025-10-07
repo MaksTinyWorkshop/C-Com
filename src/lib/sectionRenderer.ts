@@ -3,7 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 import CatalogueSection from '@components/Catalogue/CatalogueSection.astro';
 import CtaBanner from '@components/CTAs/CTABanner/CtaBanner.astro';
 import CtaDownload from '@components/CTAs/CTADownload/CtaDownload.astro';
-import FeatureGrid from '@components/FeatureGrid.astro';
+import FeatureGrid from '@components/Features/FeatureSecteur.astro';
+import FeatureTarif from '@components/Features/FeatureTarif.astro';
 import HeroSection from '@components/Home/HeroSection.astro';
 import MarkdownSection from '@components/Markdown/MarkdownSection.astro';
 import Tarifs from '@components/Tarifs/Tarifs.astro';
@@ -32,7 +33,8 @@ type SectionComponentName = keyof typeof componentMap;
 
 type SectionComponentResult =
   | (typeof componentMap)[SectionComponentName]
-  | typeof CtaDownload;
+  | typeof CtaDownload
+  | typeof FeatureTarif;
 
 type ResolvedSection = {
   Component: SectionComponentResult;
@@ -72,6 +74,18 @@ export async function resolveSection(
         },
       };
     case 'feature-grid':
+      if (section.data.key === 'grid-tarifs') {
+        return {
+          Component: FeatureTarif,
+          props: {
+            eyebrow: section.data.eyebrow,
+            title: section.data.title,
+            description: section.data.description,
+            features: section.data.features,
+          },
+        };
+      }
+      
       return {
         Component,
         props: {

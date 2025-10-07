@@ -41,13 +41,13 @@ plans:
       <p class={styles.centered}>- Options disponibles -</p>
         <ul>
           <li>
-          Création visuel statique (<span class={styles.bold}>150€ ht</span>/création produite par C'Com)
+        Création visuel statique (<span class={styles.bold}>150€ ht</span>/création produite par C'Com)
           </li>
           <li>
-          Création vidéo de 10 secondes par C'Com (<span class={styles.bold}>300€ ht</span> par création produite par C'Com)
+        Création vidéo de 10 secondes par C'Com (<span class={styles.bold}>300€ ht</span> par création produite par C'Com)
           </li>
           <li>
-          Création d'une vidéo drone | motion design (<span class={styles.bold}>Sur devis</span> uniquement)
+        Création d'une vidéo drone | motion design (<span class={styles.bold}>Sur devis</span> uniquement)
           </li>
         </ul>
 options:
@@ -58,7 +58,7 @@ options:
     type: base
     defaultSelected: true
     defaultQuantity: 1
-    minQuantity: 1
+    minQuantity: 0
     unitPrice: 150
     priceSuffix: "€ ht / achat unique"
   - id: video-standard

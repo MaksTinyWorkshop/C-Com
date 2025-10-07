@@ -110,32 +110,45 @@
 
 .modalBody {
   color: var(--color-neutral-content);
-  line-height: 1.6;
   display: flex;
   flex-direction: column;
-  gap: clamp(0.75rem, 2vw, 1.25rem);
+  text-align: justify;
+  font-size: var(--step--1);
+
+  &:where(p, ul, ol) {
+  margin: 0;
+  }
+
+
+  .modalCommon {
+  margin-bottom: 0;
+  }
+
 }
 
-.modalBody :where(p, ul, ol) {
-  margin: 0;
-}
 
 .modalPlanContent {
   color: inherit;
-}
 
-.modalBody ul {
-  padding-left: 1.25rem;
-}
-
-.modalCommon {
-  margin-bottom: 0;
-}
-
-.bold {
+  .bold {
   font-weight: 700;
+  }
+
+  .centered {
+    text-align: center;
+    color: var(--color-primary);
+  }
+
+  ul {
+    li{
+      list-style: inside;
+    }
+  }
+
 }
 
-.centered {
-  text-align: center;
-}
+
+
+
+
+

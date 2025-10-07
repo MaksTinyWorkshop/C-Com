@@ -65,6 +65,7 @@ const heroSchema = z.object({
 
 const featureGridSchema = z.object({
   component: z.literal('feature-grid'),
+  key: z.string(),
   eyebrow: z.string().optional(),
   title: z.string(),
   description: z.string().optional(),
