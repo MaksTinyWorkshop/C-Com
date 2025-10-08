@@ -1,0 +1,9 @@
+---
+import { resolveUrl } from "@lib/urlHelpers";
+
+const props = Astro.props as { src?: string } & Record<string, any>;
+const resolvedSrc =
+  typeof props.src === "string" ? resolveUrl(props.src) : props.src;
+---
+
+<img {...props} src={resolvedSrc} />

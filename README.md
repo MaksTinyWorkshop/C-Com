@@ -78,12 +78,5 @@ PUBLIC_CONTACT_ENDPOINT=/api/contact
 # GOOGLE_CONTACT_SCRIPT_URL=https://script.google.com/macros/s/EXEMPLE_CONTACT/exec
 ```
 
-### Script Apps Script
-
-- Le script utilisé se trouve dans `src/server/googleAppsScripts/contactScript.js`. Copiez son contenu dans l’éditeur Google Apps Script lié à votre feuille et déployez-le en « Application Web ».
-- La première ligne de la feuille doit contenir les entêtes exactement dans cet ordre : `Date Demande`, `Formule`, puis **un libellé par champ** (par exemple `Nom`, `Prénom`, `Adresse mail`, `Téléphone`, …). Les libellés doivent correspondre à ceux du formulaire pour que les colonnes soient alimentées automatiquement.
-- Les numéros de téléphone sont envoyés au format texte afin de conserver le zéro initial et sont déjà formattés côté client.
-
----
 
 Ce boilerplate est volontairement simple pour faciliter la prise en main. N'hésitez pas à l'adapter : intégration CMS, formulaires, animations, Tailwind, etc.

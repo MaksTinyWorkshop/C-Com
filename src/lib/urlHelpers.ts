@@ -5,8 +5,10 @@ export const withTrailingSlash = (value: string): string =>
 
 export const baseWithSlash = withTrailingSlash(baseHref);
 
+const hasProtocol = (path: string): boolean => /^[a-z][a-z0-9+.-]*:/i.test(path);
+
 export const isExternalUrl = (path: string): boolean =>
-  /^(?:[a-z+]+:)?\/\//i.test(path);
+  /^(?:[a-z+]+:)?\/\//i.test(path) || hasProtocol(path);
 
 export const resolveUrl = <T extends string | null | undefined>(path: T): T => {
   if (!path || path === "") {

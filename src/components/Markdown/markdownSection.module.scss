@@ -48,6 +48,10 @@
       .prose {
         background: var(--color-secondary);
 
+        :global(p) {
+          margin: 0;
+        }
+
         :global(img) {
           display: block;
           margin: 0 auto;

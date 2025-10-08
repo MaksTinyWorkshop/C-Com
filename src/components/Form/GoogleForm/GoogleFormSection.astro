@@ -1,0 +1,43 @@
+---
+import styles from "./googleFormSection.module.scss";
+
+type GoogleFormSectionProps = {
+  title?: string;
+  description?: string;
+  formUrl: string;
+  height?: number;
+};
+
+const {
+  title,
+  description,
+  formUrl,
+  height = 1200,
+} = Astro.props as GoogleFormSectionProps;
+
+const embedUrl = formUrl.includes("embedded=true")
+  ? formUrl
+  : `${formUrl}${formUrl.includes("?") ? "&" : "?"}embedded=true`;
+---
+
+<section class={`section-container ${styles.googleForm}`}>
+  <div class={styles.content}>
+    <div class={styles.frameWrapper}>
+      <iframe
+        src={embedUrl}
+        title={title ? `Formulaire ${title}` : "Formulaire Google"}
+        loading="lazy"
+        allow="camera; microphone"
+      >
+      </iframe>
+
+      <p class={styles.fallback}>
+        Si le formulaire ne s'affiche pas,{" "}
+        <a href={formUrl} target="_blank" rel="noopener noreferrer">
+          ouvrez-le dans un nouvel onglet
+        </a>
+        .
+      </p>
+    </div>
+  </div>
+</section>

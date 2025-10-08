@@ -7,8 +7,9 @@ import FeatureGrid from '@components/Features/FeatureSecteur.astro';
 import FeatureTarif from '@components/Features/FeatureTarif.astro';
 import HeroSection from '@components/Home/HeroSection.astro';
 import MarkdownSection from '@components/Markdown/MarkdownSection.astro';
-import ContactFormSection from '@components/Form/ContactFormSection.astro';
+import ContactFormSection from '@components/Form/HandmadeForm/ContactFormSection.astro';
 import Tarifs from '@components/Tarifs/Tarifs.astro';
+import GoogleFormSection from '@components/Form/GoogleForm/GoogleFormSection.astro';
 import FAQSection from '@components/FAQSection.astro';
 import ParcoursSection from '@components/ParcoursSection.astro';
 import ImagesGrid from '@components/ImagesGrid.astro';
@@ -26,6 +27,7 @@ const componentMap = {
   markdown: MarkdownSection,
   map: MapSection,
   cta: CtaBanner,
+  'google-form': GoogleFormSection,
   images: ImagesGrid,
   catalogue: CatalogueSection,
   testimonials: TestimonialsSection
@@ -149,6 +151,16 @@ export async function resolveSection(
           title: section.data.title,
           caption: section.data.caption,
           embedUrl: section.data.embedUrl,
+        },
+      };
+    case 'google-form':
+      return {
+        Component,
+        props: {
+          title: section.data.title,
+          description: section.data.description,
+          formUrl: section.data.formUrl,
+          height: section.data.height,
         },
       };
     case 'cta': {

@@ -1,7 +1,7 @@
 ---
-title: "C'Com | Formulaires Contact"
+title: "C'Com | Formulaire Contact"
 description: "Contactez-nous"
 sections:
-  - slug: contact/formulaire
+  - slug: google-form/contact-google-form
   - slug: cta/cta-simple
 ---

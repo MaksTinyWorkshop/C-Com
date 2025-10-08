@@ -193,6 +193,14 @@ const ctaSchema = z.object({
   file: callToActionSchema.optional(),
 });
 
+const googleFormSchema = z.object({
+  component: z.literal('google-form'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  formUrl: z.string().url(),
+  height: z.number().optional(),
+});
+
 const imagesSchema = z.object({
   component: z.literal('images'),
   images: z
@@ -262,6 +270,7 @@ const sectionSchema = z.discriminatedUnion('component', [
   markdownSchema,
   mapSchema,
   ctaSchema,
+  googleFormSchema,
   imagesSchema,
   catalogueSchema,
   testimonialsSchema,

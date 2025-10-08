@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { resolveUrl } from "@lib/urlHelpers";
+import MarkdownImage from "./MarkdownImage.astro";
 import styles from "./markdownSection.module.scss";
 import type { MarkdownSectionProps } from "@app-types/markdown";
 
@@ -28,6 +29,7 @@ const resolvedImages = images?.map((image) => ({
   ...image,
   src: resolveUrl(image.src),
 }));
+
 ---
 
 <section class={sectionClass}>
@@ -46,6 +48,10 @@ const resolvedImages = images?.map((image) => ({
   {title && <h2>{title}</h2>}
 
   <div class={styles.prose}>
-    <Content />
+    <Content
+      components={{
+        img: MarkdownImage,
+      }}
+    />
   </div>
 </section>
