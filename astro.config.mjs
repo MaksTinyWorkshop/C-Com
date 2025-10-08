@@ -18,6 +18,7 @@ export default defineConfig({
     syntaxHighlight: "prism",
     rehypePlugins: [[rehypeBaseImages, { base: siteBase }]],
   },
+  vite: { base: siteBase },
   alias: {
     "@components": "./src/components",
     "@layouts": "./src/layouts",
