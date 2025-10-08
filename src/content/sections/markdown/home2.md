@@ -2,6 +2,7 @@
 component: 'markdown'
 title: 'Notre réseau en France'
 description: 'home2'
+variant: 'home2'
 images:
     - src: '/images/map-fr.svg'
       alt: 'Mockup'

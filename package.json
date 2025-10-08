@@ -1,5 +1,5 @@
 {
-  "name": "astro-vitrine-boilerplate",
+  "name": "ccom-website",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,6 +14,7 @@
     "@astrojs/tailwind": "^6.0.2",
     "astro": "^5.14.0",
     "daisyui": "^5.1.23",
+    "googleapis": "^137.0.0",
     "sass": "^1.93.2",
     "tailwindcss": "^3.4.17",
     "webcoreui": "^1.1.0"

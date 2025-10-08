@@ -1,4 +1,4 @@
-import type { FormField } from "@types/form";
+import type { FormField } from "@app-types/form";
 
 export interface FormGroupLayout {
   title: string;

@@ -1,4 +1,4 @@
-import type { CallbackPayload } from "@types/contact";
+import type { CallbackPayload } from "@app-types/contact";
 
 const MODAL_ROOT_SELECTOR = "[data-callback-modal-root]";
 const TRIGGER_SELECTOR = "[data-callback-trigger]";

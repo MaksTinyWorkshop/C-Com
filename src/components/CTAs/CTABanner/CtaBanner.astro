@@ -3,10 +3,15 @@ import Spacer from "@components/UI/Spacer.astro";
 import { resolveUrl } from "@lib/urlHelpers";
 import styles from "./ctaBanner.module.scss";
 import CtaDevis from "../CTADevis/CtaDevis.astro";
-import type { CTABannerProps } from "@types/cta";
+import type { CTABannerProps } from "@app-types/cta";
 
-const { eyebrow, title, description, content, ctas = [] } =
-  Astro.props as CTABannerProps;
+const {
+  eyebrow,
+  title,
+  description,
+  content,
+  ctas = [],
+} = Astro.props as CTABannerProps;
 const resolvedCtas = ctas.map((cta) => ({
   ...cta,
   href: resolveUrl(cta.href || "/"),
@@ -35,7 +40,7 @@ const resolvedClassName = () => {
         </div>
         <div class={styles.cta}>
           <h2>{title}</h2>
-          {description && <p set:html={description} />}
+          {description && <p class={styles.bold} set:html={description} />}
           {content && <p class={styles.bold} set:html={content} />}
         </div>
         {primaryCta && (

@@ -1,13 +1,19 @@
 ---
 import SectionHeader from "@components/UI/SectionHeader.astro";
 import Spacer from "./UI/Spacer.astro";
-import type { FAQSectionProps } from "@types/faq";
+import type { FAQSectionProps } from "@app-types/faq";
 
 const { title, description, questions } = Astro.props as FAQSectionProps;
 ---
 
 <section class="section-container questions">
-  <SectionHeader class="intro" title={title} description={description} />
+  <SectionHeader
+    class="intro"
+    title={title}
+    description={description}
+    headingLevel="h2"
+    as="header"
+  />
   <div class="faq-accordion">
     {
       questions.map(({ question, answer }) => (
@@ -26,17 +32,13 @@ const { title, description, questions } = Astro.props as FAQSectionProps;
   <Spacer size="2rem" />
 </section>
 
-<style lang="scss">
+<style lang="scss" is:global>
   .questions {
     .intro {
-      margin: var(--space-3) auto;
-      text-align: center;
-    }
-
-    h2 {
-      color: var(--color-primary);
-      font-weight: 600;
-      text-transform: uppercase;
+      .title {
+        margin: var(--space-2) 0 var(--space-2);
+        font-weight: 800;
+      }
     }
 
     .faq-accordion {

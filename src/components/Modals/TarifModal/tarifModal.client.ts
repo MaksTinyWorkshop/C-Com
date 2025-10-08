@@ -1,4 +1,4 @@
-import type { PlanDetailPayload } from "@types/tarifs";
+import type { PlanDetailPayload } from "@app-types/tarifs";
 
 const MODAL_SELECTOR = "[data-tarif-modal-root]";
 const ICON_SELECTOR = "[data-modal-icon]";

@@ -3,6 +3,7 @@ const SELECT_SELECTOR = "[data-contact-select]";
 const FORM_SELECTOR = "[data-formula-fields]";
 const NUMBER_FIELD_SELECTOR = "[data-number-field]";
 const FORM_ACTIVE_CLASS = "is-active";
+const CONTACT_ENDPOINT = import.meta.env.PUBLIC_CONTACT_ENDPOINT;
 
 const normalise = (value: string | null | undefined) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -24,6 +25,14 @@ const clampNumeric = (value: number, min: number, max: number | null) => {
   }
 
   return Math.min(Math.max(value, min), upper);
+};
+
+const escapeSelector = (value: string) => {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return CSS.escape(value);
+  }
+
+  return value.replace(/([ #;?%&,.+*~':"!^$[\]()=>|/@])/g, "\\$1");
 };
 
 type NumberFieldState = {
@@ -214,6 +223,149 @@ const activateFormula = (
   }
 };
 
+type ContactEntry = {
+  id: string;
+  label: string;
+  value: string;
+};
+
+const buildContactPayload = (form: HTMLFormElement) => {
+  const rawFormulaId = form.dataset.formula ?? "";
+  const formulaId = rawFormulaId.trim();
+
+  if (!formulaId) {
+    return null;
+  }
+
+  const formulaLabel = (form.dataset.formulaLabel ?? "").trim();
+  const formData = new FormData(form);
+
+  const entries: ContactEntry[] = [];
+
+  formData.forEach((value, key) => {
+    const selector = `[name="${escapeSelector(key)}"]`;
+    const field = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+      selector,
+    );
+
+    const rawLabel = field?.dataset.fieldLabel ?? key;
+    const label = rawLabel.trim() || key;
+    const rawValue =
+      typeof value === "string"
+        ? value
+        : value instanceof File
+          ? value.name
+          : value === undefined || value === null
+            ? ""
+            : String(value);
+
+    entries.push({
+      id: key,
+      label,
+      value: rawValue.trim(),
+    });
+  });
+
+  return {
+    formulaId,
+    formulaLabel,
+    entries,
+    pageUrl: window.location.href,
+  };
+};
+
+const buildContactRequest = (payload: ReturnType<typeof buildContactPayload>) => {
+  if (!payload) {
+    throw new Error("Invalid contact payload");
+  }
+
+  if (!CONTACT_ENDPOINT) {
+    throw new Error("PUBLIC_CONTACT_ENDPOINT is not set");
+  }
+
+  const endpointUrl = new URL(CONTACT_ENDPOINT, window.location.href);
+  const isCrossOrigin = endpointUrl.origin !== window.location.origin;
+
+  const requestInit: RequestInit = {
+    method: "POST",
+  };
+
+  if (isCrossOrigin) {
+    const params = new URLSearchParams();
+    params.set("data", JSON.stringify(payload));
+    requestInit.body = params.toString();
+    requestInit.headers = {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    };
+    requestInit.mode = "no-cors";
+  } else {
+    requestInit.body = JSON.stringify(payload);
+    requestInit.headers = {
+      "Content-Type": "application/json",
+    };
+  }
+
+  return { requestInit };
+};
+
+const bindContactFormSubmission = (forms: HTMLFormElement[]) => {
+  forms.forEach((form) => {
+    if (form.dataset.contactSubmitBound === "true") {
+      return;
+    }
+
+    form.dataset.contactSubmitBound = "true";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const submitButton = form.querySelector<HTMLButtonElement>(".submit-button");
+      const successMessage = form.querySelector<HTMLElement>("[data-form-success]");
+      const errorMessage = form.querySelector<HTMLElement>("[data-form-error]");
+      const numberFields = Array.from(
+        form.querySelectorAll<HTMLElement>(NUMBER_FIELD_SELECTOR),
+      );
+
+      successMessage?.setAttribute("hidden", "");
+      errorMessage?.setAttribute("hidden", "");
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.dataset.loading = "true";
+      }
+
+      try {
+        if (!CONTACT_ENDPOINT) {
+          throw new Error("PUBLIC_CONTACT_ENDPOINT is not set");
+        }
+
+        const payload = buildContactPayload(form);
+        const { requestInit } = buildContactRequest(payload);
+        const response = await fetch(CONTACT_ENDPOINT, requestInit);
+
+        if (!requestInit.mode && !response.ok) {
+          const text = await response.text();
+          throw new Error(text || "Réponse invalide du serveur");
+        }
+
+        form.reset();
+        numberFields.forEach((container) => {
+          syncNumberField(container, "");
+        });
+        successMessage?.removeAttribute("hidden");
+      } catch (error) {
+        console.error("contact form submit failed", error);
+        errorMessage?.removeAttribute("hidden");
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          delete submitButton.dataset.loading;
+        }
+      }
+    });
+  });
+};
+
 const initialiseSection = (section: HTMLElement) => {
   if (section.dataset.contactFormInitialised === "true") {
     return;
@@ -229,6 +381,7 @@ const initialiseSection = (section: HTMLElement) => {
   }
 
   numberFields.forEach(initialiseNumberField);
+  bindContactFormSubmission(forms);
 
   const urlParams = new URLSearchParams(window.location.search);
   const requestedFormulaParam = urlParams.get("formula") ?? urlParams.get("plan");

@@ -3,7 +3,7 @@ import Icon from "@components/Icons/Icon.astro";
 import type { IconProps } from "@components/Icons/icon";
 import { resolveUrl, isExternalUrl } from "@lib/urlHelpers";
 import styles from "./ctaDownload.module.scss";
-import type { CTADownloadSectionProps } from "@types/cta";
+import type { CTADownloadSectionProps } from "@app-types/cta";
 
 const { title, file, content, downloadName } =
   Astro.props as CTADownloadSectionProps;

@@ -2,7 +2,7 @@
 import Icon from "@components/Icons/Icon.astro";
 import SectionHeader from "@components/UI/SectionHeader.astro";
 import Spacer from "@components/UI/Spacer.astro";
-import type { FeatureSectionProps } from "@types/features";
+import type { FeatureSectionProps } from "@app-types/features";
 
 const { eyebrow, title, description, features } =
   Astro.props as FeatureSectionProps;
@@ -14,7 +14,7 @@ const { eyebrow, title, description, features } =
     eyebrow={eyebrow}
     title={title}
     description={description}
-    headingLevel="h1"
+    headingLevel="h2"
     as="header"
   />
   <div class="features">
@@ -33,17 +33,10 @@ const { eyebrow, title, description, features } =
   <Spacer size="2rem" />
 </section>
 
-<style lang="scss">
+<style lang="scss" is:global>
   .intro {
-    margin: 0 auto;
-    text-align: center;
-
-    &__title {
-      margin: var(--space-2) 0 var(--space-5);
-      color: var(--color-secondary);
-      font-size: var(--step-2);
+    .title {
       font-weight: 800;
-      text-transform: none;
     }
   }
   .features {

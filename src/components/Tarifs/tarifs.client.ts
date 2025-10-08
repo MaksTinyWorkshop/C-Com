@@ -3,7 +3,7 @@ import type {
   PlanConfig,
   PlanDetailPayload,
   TarifClientConfig,
-} from "@types/tarifs";
+} from "@app-types/tarifs";
 
 const ROOT_SELECTOR = "[data-tarifs-root]";
 const PLAN_CARD_SELECTOR = "[data-plan-card]";

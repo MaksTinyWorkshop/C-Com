@@ -16,7 +16,7 @@
     }
     &--process {
       h2 {
-        margin-bottom: var(--space-3);
+        margin: var(--space-3) 0;
         color: var(--color-primary);
         font-size: var(--step-2);
         font-weight: 600;
@@ -41,6 +41,29 @@
           display: block;
           margin: 0 auto;
         }
+      }
+    }
+
+    &--fonctionnement1 {
+      .prose {
+        background: var(--color-secondary);
+
+        :global(img) {
+          display: block;
+          margin: 0 auto;
+        }
+      }
+    }
+
+    &--home {
+      :global(.image-gallery) {
+        margin: var(--space-3) 0;
+      }
+    }
+
+    &--home2 {
+      .prose {
+        margin-bottom: var(--space-4);        
       }
     }
   }

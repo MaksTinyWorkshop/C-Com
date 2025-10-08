@@ -10,7 +10,7 @@ import type {
   ContactFormSectionProps,
   FormField,
   FormFormula,
-} from "@types/form";
+} from "@app-types/form";
 
 const {
   title,
@@ -87,7 +87,9 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
 
               const isNumberField = fieldType === "number";
               const fieldClass = `form-field${isNumberField ? " form-field--number" : ""}`;
-              const labelClass = isNumberField ? "form-label" : "visually-hidden";
+              const labelClass = isNumberField
+                ? "form-label"
+                : "visually-hidden";
 
               switch (fieldType) {
                 case "textarea":
@@ -102,6 +104,7 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                         name={field.id}
                         placeholder={placeholder}
                         required={isRequired}
+                        data-field-label={field.label}
                       />
                     </div>
                   );
@@ -113,7 +116,12 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                         {isRequired ? "*" : ""}
                       </label>
                       <div class="field-select">
-                        <select id={fieldId} name={field.id} required={isRequired}>
+                        <select
+                          id={fieldId}
+                          name={field.id}
+                          required={isRequired}
+                          data-field-label={field.label}
+                        >
                           <option value="" disabled selected>
                             {placeholder}
                           </option>
@@ -173,6 +181,7 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                           step={stepAttr}
                           placeholder={placeholder}
                           required={isRequired}
+                          data-field-label={field.label}
                         />
                         <button
                           type="button"
@@ -199,6 +208,7 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                         name={field.id}
                         placeholder={placeholder}
                         required={isRequired}
+                        data-field-label={field.label}
                       />
                     </div>
                   );
@@ -235,18 +245,9 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                 }`}
                 data-formula-fields
                 data-formula={formula.id}
+                data-formula-label={formula.label}
                 method="post"
               >
-                <div class="form-copy">
-                  <h2 class="form-title">{formula.label}</h2>
-                  {formula.description && (
-                    <p class="form-description">{formula.description}</p>
-                  )}
-                  {formula.helper && (
-                    <p class="form-helper">{formula.helper}</p>
-                  )}
-                </div>
-
                 <div class="form-groups">
                   {groups.map(({ title, rows }) => {
                     const renderedRows = rows
@@ -271,8 +272,11 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                   </button>
                 </div>
 
-                <p class="form-success" role="status" hidden>
+                <p class="form-success" role="status" data-form-success hidden>
                   {successMessage}
+                </p>
+                <p class="form-error" role="alert" data-form-error hidden>
+                  Une erreur est survenue. Merci de réessayer plus tard.
                 </p>
               </form>
             );
