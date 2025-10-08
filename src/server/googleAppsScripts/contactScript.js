@@ -5,8 +5,8 @@
 /**
  * Configuration
  */
-const CONTACT_SHEET_ID = '1hh4LihfRMUGLwulb5vjqq_nhkkoi7jf21lJ2wkuqNXQ';
-const CONTACT_SHEET_NAME = 'Feuille 1';
+const CONTACT_SHEET_ID = 'identifiant de la feuille google sheet';
+const CONTACT_SHEET_NAME = 'Nom de la feuille';
 const STATIC_HEADERS = ['Date Demande', 'Formule'];
 
 /**

@@ -15,7 +15,7 @@ export default defineConfig({
   }),
   output: 'static',
   // Conserve ce sous-chemin si le site est servi à partir de /CCom
-  base: '/CCom',
+  base: '/C-Com',
   markdown: {
     syntaxHighlight: 'prism',
   },
