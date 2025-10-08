@@ -2,7 +2,6 @@ import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
 import { webcore } from "webcoreui/integration";
-import node from "@astrojs/node";
 import { rehypeBaseImages } from "./src/lib/rehypeBaseImages";
 
 const siteUrl = "https://makstinyworkshop.github.io";
@@ -13,10 +12,7 @@ export default defineConfig({
 
   scopedStyleStrategy: "where",
   integrations: [tailwind(), mdx(), webcore()],
-  adapter: node({
-    mode: "standalone",
-  }),
-  output: "static",
+  output: 'static',
   base: siteBase,
   markdown: {
     syntaxHighlight: "prism",
