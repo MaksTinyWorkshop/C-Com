@@ -1,34 +1,49 @@
 ---
-import type { IconProps } from './icon'
-import iconMap from './map'
+import type { IconProps } from "./icon";
+import iconMap from "./map";
 
 interface Props extends IconProps {}
 
-const {
-    type,
-    size = 24,
-    color,
-    theme,
-    iconSet
-} = Astro.props
+const { type, size = 24, color, theme, iconSet } = Astro.props;
 
 const icons = {
-    ...iconMap,
-    ...(iconSet || {})
-}
+  ...iconMap,
+  ...(iconSet || {}),
+};
 
-const svg = icons[type as keyof typeof iconMap]
+const svg = icons[type as keyof typeof iconMap];
 
 if (!svg) {
-    // eslint-disable-next-line no-console
-    console.error('Cannot find icon type:', type)
+  console.error("Cannot find icon type:", type);
 }
 
-const icon = svg
-    ?.replace('width="24"', `width=${size}`)
-    ?.replace('height="24"', color || theme
-        ? `height=${size} color=${color || `var(--w-color-${theme})`}`
-        : `height=${size}`)
+const ensureAttribute = (content: string, attr: string, value: string) => {
+  const regex = new RegExp(`${attr}="[^"]*"`, "i");
+  if (regex.test(content)) {
+    return content.replace(regex, `${attr}="${value}"`);
+  }
+  return content.replace("<svg", `<svg ${attr}="${value}"`);
+};
+
+let icon = svg ? String(svg) : "";
+
+if (icon) {
+  icon = ensureAttribute(icon, "width", String(size));
+  icon = ensureAttribute(icon, "height", String(size));
+
+  const targetColor = color ?? (theme ? `var(--w-color-${theme})` : null);
+
+  if (targetColor) {
+    icon = icon.replace(
+      /(fill|stroke)="(?!none)[^"]*"/gi,
+      (_match, attr: string) => `${attr}="${targetColor}"`,
+    );
+
+    if (!/(fill|stroke)="(?!none)/i.test(icon)) {
+      icon = ensureAttribute(icon, "fill", targetColor);
+    }
+  }
+}
 ---
 
 <Fragment set:html={icon} />

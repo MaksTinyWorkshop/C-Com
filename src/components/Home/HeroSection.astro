@@ -21,14 +21,6 @@ const emphasizePhrase = (value: string) =>
 
 <section class="hero" style={backgroundStyle}>
   <div class="hero__content">
-    <iframe
-      src="https://docs.google.com/forms/d/e/1FAIpQLSfkx2hR64_sc_frCr5NCe97hAZtJXAUJEpWXTN3nTZwSQtK9A/viewform?embedded=true"
-      class="formTest"
-      frameborder="0"
-      marginheight="0"
-      marginwidth="0">Chargement…</iframe
-    >
-    <!--
     <div class="copy">
       {eyebrow && <span class="eyebrow">{eyebrow}</span>}
       <h1 set:html={emphasizePhrase(title)} />
@@ -47,186 +39,174 @@ const emphasizePhrase = (value: string) =>
       )
     }
   </div>
-  -->
-  </div>
+</section>
 
-  <style lang="scss">
-    .hero {
-      position: relative;
-      height: calc(100vh - var(--navbar-total-height));
+<style lang="scss">
+  .hero {
+    position: relative;
+    height: calc(100vh - var(--navbar-total-height));
 
-      padding: var(--space-3) 0;
-      /* padding: 0 var(--space-3); */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-color: var(--color-base-content);
-      color: var(--color-neutral);
+    padding: var(--space-3) 0;
+    padding: 0 var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--color-base-content);
+    color: var(--color-neutral);
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      var(--color-primary-transp),
+      var(--color-primary-transp)
+    );
+    pointer-events: none;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .copy {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .copy h1 {
+    margin: 0;
+    line-height: 1.1;
+    font-size: var(--step-5);
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
+    font-family: var(fontBold);
+    color: var(--color-base-100);
+
+    strong {
+      font-weight: 600;
     }
+  }
 
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg,
-        var(--color-primary-transp),
-        var(--color-primary-transp)
-      );
-      pointer-events: none;
+  .copy p {
+    margin: 0;
+    font-size: var(--step-0);
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+  }
+
+  .copy p strong,
+  .copy p em {
+    color: var(--color-secondary);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: center;
+    font-weight: 600;
+    font-size: var(--step--1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+  }
+
+  .cta-primary {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cta-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cta-card {
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-base-100);
+    font-weight: 600;
+    font-size: var(--step-1);
+    border-radius: var(--radius-full);
+    color: var(--color-primary);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .cta-card:hover,
+  .cta-card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .cta-card__icon {
+    width: var(--step-4);
+    height: var(--step-4);
+    border-radius: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+
+  .cta-card__icon :global(svg) {
+    width: var(--step-4);
+    height: var(--step-4);
+    display: block;
+  }
+
+  .cta-card__label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .inlineIcon {
+    display: inline-flex;
+    width: var(--step-velux);
+    vertical-align: middle;
+  }
+
+  .inlineIcon :global(svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .accent {
+    color: var(--color-primary);
+  }
+
+  @media (min-width: 960px) {
+    .hero {
+      min-height: calc(100vh - var(--space-4));
+      padding-block: var(--space-5);
     }
 
     .hero__content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--space-4);
-      text-align: center;
-      /* tests */
-      width: 100%;
-      max-width: 800px;
-      margin-inline: auto;
-      height: 100%;
-      .formTest {
-        width: 100%;
-        height: 100%;
-      }
-      /* Fin du test */
-    }
-
-    .copy {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .copy h1 {
-      margin: 0;
-      line-height: 1.1;
-      font-size: var(--step-5);
-      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
-      font-family: var(fontBold);
-      color: var(--color-base-100);
-
-      strong {
-        font-weight: 600;
-      }
-    }
-
-    .copy p {
-      margin: 0;
-      font-size: var(--step-0);
-      text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-    }
-
-    .copy p strong,
-    .copy p em {
-      color: var(--color-secondary);
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      align-self: center;
-      font-weight: 600;
-      font-size: var(--step--1);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--color-secondary);
-    }
-
-    .cta-primary {
-      display: flex;
-      justify-content: center;
+      width: min(600px, 100%);
     }
 
     .cta-cards {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
+      gap: var(--space-3);
     }
 
     .cta-card {
-      padding: var(--space-2) var(--space-3);
-      background: var(--color-base-100);
-      font-weight: 600;
-      font-size: var(--step-1);
-      border-radius: var(--radius-full);
-      color: var(--color-primary);
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+      font-size: var(--step-2);
+      gap: var(--space-1);
     }
-
-    .cta-card:hover,
-    .cta-card:focus-visible {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-    }
-
-    .cta-card__icon {
-      width: var(--step-4);
-      height: var(--step-4);
-      border-radius: 0.9rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-    }
-
-    .cta-card__icon :global(svg) {
-      width: var(--step-4);
-      height: var(--step-4);
-      display: block;
-    }
-
-    .cta-card__label {
-      flex: 1;
-      text-align: center;
-    }
-
-    .inlineIcon {
-      display: inline-flex;
-      width: var(--step-velux);
-      vertical-align: middle;
-    }
-
-    .inlineIcon :global(svg) {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .accent {
-      color: var(--color-primary);
-    }
-
-    @media (min-width: 960px) {
-      .hero {
-        min-height: calc(100vh - var(--space-4));
-        padding-block: var(--space-5);
-      }
-
-      .hero__content {
-        width: min(600px, 100%);
-      }
-
-      .cta-cards {
-        gap: var(--space-3);
-      }
-
-      .cta-card {
-        font-size: var(--step-2);
-        gap: var(--space-1);
-      }
-    }
-  </style>
-</section>
+  }
+</style>

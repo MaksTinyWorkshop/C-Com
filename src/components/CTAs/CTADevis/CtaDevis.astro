@@ -25,6 +25,10 @@ const { label, href, icon, iconProps = {} } = Astro.props as CTADevisProps;
     font-size: var(--step-1);
     border-radius: var(--radius-full);
     color: var(--color-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
     transition:
       transform 0.2s ease,
       box-shadow 0.2s ease;

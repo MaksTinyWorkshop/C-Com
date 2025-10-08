@@ -1,10 +1,10 @@
 ---
 import Spacer from "@components/UI/Spacer.astro";
 import styles from "./navbar.module.scss";
-import CtaToCallback from "@components/CTAs/CTAtoCallback/CtaToCallback.astro";
 import Icon from "@components/Icons/Icon.astro";
 import { mainNavigation, companyDetails } from "@lib/siteData";
 import { resolveUrl, stripBaseFromPath } from "@lib/urlHelpers";
+import CtaDevis from "@components/CTAs/CTADevis/CtaDevis.astro";
 
 const resolveHref = (path: string) => resolveUrl(path || "/");
 
@@ -21,6 +21,24 @@ const logoAsset = (() => {
     alt: primaryLogo.source.alt,
   };
 })();
+
+const menuLogo = (() => {
+  const fullLogo = companyDetails.logos?.find((logo) =>
+    logo.name.toLowerCase().includes("full")
+  );
+  return fullLogo
+    ? {
+        url: resolveUrl(fullLogo.source.src),
+        alt: fullLogo.source.alt,
+      }
+    : logoAsset;
+})();
+
+const linkedInLink =
+  companyDetails.socialLinks?.find(
+    (link) =>
+      link.icon === "linkedin" || link.name.toLowerCase().includes("linkedin")
+  ) ?? null;
 
 const menu = mainNavigation.map((item) => {
   const targetPath = item.path;
@@ -72,7 +90,53 @@ const menu = mainNavigation.map((item) => {
         }
       </ul>
       <Spacer size="3rem" axis="vertical" />
-      <CtaToCallback />
+      <CtaDevis label="Demander un devis" href={resolveUrl("/contact")} />
+      {
+        contactItems.length > 0 && (
+          <div class={styles.menu_contacts}>
+            {contactItems.map((item) => (
+              <a
+                class={styles.menu_contact}
+                href={item.href}
+                aria-label={item.label}
+              >
+                <span class={styles.menu_contact_icon}>
+                  <Icon type={item.icon} color="var(--color-secondary)" />
+                </span>
+                <span class={styles.menu_contact_label}>{item.label}</span>
+              </a>
+            ))}
+          </div>
+        )
+      }
+      {
+        (menuLogo.url || linkedInLink) && (
+          <div class={styles.menu_footer}>
+            {menuLogo.url && (
+              <img
+                src={menuLogo.url}
+                alt={menuLogo.alt ?? "Logo"}
+                class={styles.menu_logo}
+              />
+            )}
+            {linkedInLink && (
+              <a
+                class={styles.menu_social}
+                href={linkedInLink.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={linkedInLink.ariaLabel ?? "LinkedIn"}
+              >
+                <Icon
+                  type={linkedInLink.icon ?? "linkedin"}
+                  color="var(--color-secondary)"
+                />
+                <span>{linkedInLink.name}</span>
+              </a>
+            )}
+          </div>
+        )
+      }
     </div>
   </div>
   {
@@ -85,7 +149,7 @@ const menu = mainNavigation.map((item) => {
             aria-label={item.label}
           >
             <span class={styles.contact_icon}>
-              <Icon type={item.icon} color="var(--color-neutral)" />
+              <Icon type={item.icon} color="var(--color-secondary)" />
             </span>
             <span class={styles.contact_label}>{item.label}</span>
           </a>
