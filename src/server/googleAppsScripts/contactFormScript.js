@@ -8,6 +8,8 @@
 const CONTACT_SHEET_ID = 'identifiant de la feuille google sheet';
 const CONTACT_SHEET_NAME = 'Nom de la feuille';
 const STATIC_HEADERS = ['Date Demande', 'Formule'];
+// Définir cette propriété dans "Project Settings > Script properties" côté Apps Script.
+const CONTACT_SECRET_PROPERTY_KEY = 'copier ici  la variable définie dans GOOGLE_CONTACT_SCRIPT_SECRET';
 
 /**
  * Point d’entrée appelé par Astro (POST).
@@ -24,6 +26,8 @@ function doPost(e) {
     if (!payload) {
       throw new Error('Payload vide ou invalide.');
     }
+
+    validateSecret(payload);
 
     const { formulaId, formulaLabel } = payload;
     if (!formulaId) {
@@ -47,7 +51,11 @@ function doPost(e) {
     sheet.appendRow(row);
     return jsonResponse({ success: true });
   } catch (error) {
-    return jsonResponse({ success: false, message: error.message }, 500);
+    const status =
+      typeof error.httpStatus === 'number' && !Number.isNaN(error.httpStatus)
+        ? error.httpStatus
+        : 500;
+    return jsonResponse({ success: false, message: error.message }, status);
   }
 }
 
@@ -160,4 +168,39 @@ function jsonResponse(body, status = 200) {
   return ContentService.createTextOutput(JSON.stringify(body))
     .setMimeType(ContentService.MimeType.JSON)
     .setStatusCode(status);
+}
+
+/**
+ * Vérifie que la demande est authentifiée via un secret partagé.
+ */
+function validateSecret(payload) {
+  const storedSecretValue = PropertiesService.getScriptProperties().getProperty(
+    CONTACT_SECRET_PROPERTY_KEY
+  );
+  const storedSecret = storedSecretValue ? storedSecretValue.trim() : '';
+
+  if (!storedSecret) {
+    return;
+  }
+
+  let receivedSecret = '';
+  if (payload.secret != null) {
+    receivedSecret =
+      typeof payload.secret === 'string'
+        ? payload.secret.trim()
+        : String(payload.secret).trim();
+  }
+
+  if (!receivedSecret || receivedSecret !== storedSecret) {
+    throw createHttpError('Accès non autorisé.', 403);
+  }
+}
+
+/**
+ * Crée une erreur contenant un code HTTP personnalisé.
+ */
+function createHttpError(message, status) {
+  const error = new Error(message);
+  error.httpStatus = status;
+  return error;
 }

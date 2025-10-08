@@ -21,6 +21,11 @@ const contactScriptUrl =
   process.env.GOOGLE_CONTACT_SCRIPT_URL ??
   process.env.GOOGLE_APPS_SCRIPT_URL;
 
+const contactScriptSecret =
+  import.meta.env.GOOGLE_CONTACT_SCRIPT_SECRET ??
+  process.env.GOOGLE_CONTACT_SCRIPT_SECRET ??
+  "";
+
 const parsePayload = async (request: Request): Promise<ContactPayload> => {
   const contentType = request.headers.get("content-type") ?? "";
   const rawBody = await request.text();
@@ -106,6 +111,10 @@ export const POST: APIRoute = async ({ request }) => {
       throw new Error("Missing Google Apps Script endpoint");
     }
 
+    if (import.meta.env.PROD && !contactScriptSecret) {
+      throw new Error("Missing Google Apps Script shared secret");
+    }
+
     const body = await parsePayload(request);
     const formulaId = body.formulaId?.trim();
     const formulaLabel = body.formulaLabel?.trim();
@@ -141,6 +150,7 @@ export const POST: APIRoute = async ({ request }) => {
         formulaLabel,
         fields,
         entries: Array.isArray(body.entries) ? body.entries : undefined,
+        ...(contactScriptSecret ? { secret: contactScriptSecret } : {}),
       }),
     });
 
