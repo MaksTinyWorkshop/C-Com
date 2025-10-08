@@ -6,7 +6,7 @@ import node from "@astrojs/node";
 import { rehypeBaseImages } from "./src/lib/rehypeBaseImages";
 
 const siteUrl = "https://makstinyworkshop.github.io";
-const siteBase = "";
+const siteBase = "/C-com";
 
 export default defineConfig({
   site: siteUrl,
