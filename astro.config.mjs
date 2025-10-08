@@ -11,7 +11,7 @@ export default defineConfig({
   integrations: [tailwind(), mdx(), webcore()],
   // Rajout de ces deux lignes pour GithubPages
   output: 'static',
-  base: '/Nom_du_Repo',
+  base: '/CCom',
   //
   markdown: {
     syntaxHighlight: 'prism',
