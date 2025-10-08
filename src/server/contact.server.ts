@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { appendSheetRow } from "./googleSheets";
 
 export const prerender = false;
 
@@ -12,29 +11,26 @@ type ContactEntry = {
 interface ContactPayload {
   formulaId?: string;
   formulaLabel?: string;
+  fields?: Record<string, unknown>;
   entries?: ContactEntry[];
-  pageUrl?: string;
 }
 
-const spreadsheetId =
-  import.meta.env.GOOGLE_CONTACT_SHEET_ID ??
-  process.env.GOOGLE_CONTACT_SHEET_ID ??
-  import.meta.env.GOOGLE_SHEET_ID ??
-  process.env.GOOGLE_SHEET_ID;
-
-const sheetName =
-  import.meta.env.GOOGLE_CONTACT_SHEET_TAB ??
-  process.env.GOOGLE_CONTACT_SHEET_TAB ??
-  import.meta.env.GOOGLE_SHEET_TAB ??
-  process.env.GOOGLE_SHEET_TAB ??
-  "ContactFormResponses";
+const contactScriptUrl =
+  import.meta.env.GOOGLE_CONTACT_SCRIPT_URL ??
+  import.meta.env.GOOGLE_APPS_SCRIPT_URL ??
+  process.env.GOOGLE_CONTACT_SCRIPT_URL ??
+  process.env.GOOGLE_APPS_SCRIPT_URL;
 
 const parsePayload = async (request: Request): Promise<ContactPayload> => {
   const contentType = request.headers.get("content-type") ?? "";
+  const rawBody = await request.text();
+
+  if (!rawBody) {
+    return {};
+  }
 
   if (contentType.includes("application/x-www-form-urlencoded")) {
-    const raw = await request.text();
-    const params = new URLSearchParams(raw);
+    const params = new URLSearchParams(rawBody);
     const dataParam = params.get("data");
 
     if (dataParam) {
@@ -53,45 +49,67 @@ const parsePayload = async (request: Request): Promise<ContactPayload> => {
     return body as ContactPayload;
   }
 
-  return (await request.json()) as ContactPayload;
+  try {
+    return JSON.parse(rawBody) as ContactPayload;
+  } catch {
+    throw new SyntaxError("Invalid JSON payload");
+  }
 };
 
-const sanitiseEntry = (entry: ContactEntry): { label: string; value: string } | null => {
-  if (!entry) {
-    return null;
+const normaliseValue = (value: unknown) =>
+  typeof value === "string"
+    ? value.trim()
+    : value === undefined || value === null
+      ? ""
+      : String(value).trim();
+
+const extractFields = (payload: ContactPayload) => {
+  const fields: Record<string, string> = {};
+
+  if (payload.fields && typeof payload.fields === "object") {
+    for (const [key, rawValue] of Object.entries(payload.fields)) {
+      const trimmedKey = key.trim();
+      if (!trimmedKey) {
+        continue;
+      }
+      fields[trimmedKey] = normaliseValue(rawValue);
+    }
   }
 
-  const rawLabel =
-    typeof entry.label === "string" && entry.label.trim()
-      ? entry.label.trim()
-      : typeof entry.id === "string"
-        ? entry.id.trim()
-        : "";
+  if (Object.keys(fields).length === 0 && Array.isArray(payload.entries)) {
+    payload.entries.forEach((entry) => {
+      if (!entry) {
+        return;
+      }
 
-  if (!rawLabel) {
-    return null;
+      const key =
+        typeof entry.id === "string" && entry.id.trim()
+          ? entry.id.trim()
+          : typeof entry.label === "string"
+            ? entry.label.trim()
+            : "";
+
+      if (!key) {
+        return;
+      }
+
+      fields[key] = normaliseValue(entry.value);
+    });
   }
 
-  const rawValue =
-    typeof entry.value === "string"
-      ? entry.value.trim()
-      : entry.value === undefined || entry.value === null
-        ? ""
-        : String(entry.value).trim();
-
-  return { label: rawLabel, value: rawValue };
+  return fields;
 };
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    if (!spreadsheetId) {
-      throw new Error("Missing Google Sheets configuration");
+    if (!contactScriptUrl) {
+      throw new Error("Missing Google Apps Script endpoint");
     }
 
     const body = await parsePayload(request);
     const formulaId = body.formulaId?.trim();
     const formulaLabel = body.formulaLabel?.trim();
-    const rawEntries = Array.isArray(body.entries) ? body.entries : [];
+    const fields = extractFields(body);
 
     if (!formulaId) {
       return new Response(
@@ -103,11 +121,7 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const entries = rawEntries
-      .map((entry) => sanitiseEntry(entry))
-      .filter((entry): entry is { label: string; value: string } => Boolean(entry));
-
-    if (entries.length === 0) {
+    if (Object.keys(fields).length === 0) {
       return new Response(
         JSON.stringify({ message: "Aucune donnée à enregistrer." }),
         {
@@ -117,21 +131,24 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const meaningfulEntries = entries.filter((entry) => entry.value !== "");
-    const fieldDescriptions =
-      meaningfulEntries.length > 0
-        ? meaningfulEntries.map(({ label, value }) => `${label}: ${value}`)
-        : entries.map(({ label, value }) => `${label}: ${value}`);
-
-    const userAgent = request.headers.get("user-agent") ?? "";
-    const timestamp = new Date().toISOString();
-    const pageUrl = body.pageUrl?.trim?.() ?? "";
-
-    await appendSheetRow({
-      spreadsheetId,
-      sheetName,
-      values: [timestamp, formulaLabel || formulaId, formulaId, pageUrl, userAgent, ...fieldDescriptions],
+    const response = await fetch(contactScriptUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        formulaId,
+        formulaLabel,
+        fields,
+        entries: Array.isArray(body.entries) ? body.entries : undefined,
+      }),
     });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      throw new Error(responseText || `Apps Script responded with ${response.status}`);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

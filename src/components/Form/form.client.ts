@@ -5,6 +5,41 @@ const NUMBER_FIELD_SELECTOR = "[data-number-field]";
 const FORM_ACTIVE_CLASS = "is-active";
 const CONTACT_ENDPOINT = import.meta.env.PUBLIC_CONTACT_ENDPOINT;
 
+const collapseWhitespace = (value: string) => value.replace(/\s+/g, " ").trim();
+
+const findFieldElement = (form: HTMLFormElement, name: string): HTMLElement | null => {
+  const element = form.elements.namedItem(name);
+
+  if (!element) {
+    return null;
+  }
+
+  if (element instanceof RadioNodeList) {
+    for (const node of Array.from(element)) {
+      if (node instanceof HTMLElement) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  return element instanceof HTMLElement ? element : null;
+};
+
+const isPhoneField = (id: string, label: string) => {
+  const target = `${id} ${label}`.toLowerCase();
+  return target.includes("phone") || target.includes("téléphone") || target.includes("telephone");
+};
+
+const formatPhoneValue = (rawValue: string) => {
+  const collapsed = collapseWhitespace(rawValue);
+  if (!collapsed) {
+    return "";
+  }
+
+  return collapsed.startsWith("'") ? collapsed : `'${collapsed}`;
+};
+
 const normalise = (value: string | null | undefined) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
 
@@ -25,14 +60,6 @@ const clampNumeric = (value: number, min: number, max: number | null) => {
   }
 
   return Math.min(Math.max(value, min), upper);
-};
-
-const escapeSelector = (value: string) => {
-  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
-    return CSS.escape(value);
-  }
-
-  return value.replace(/([ #;?%&,.+*~':"!^$[\]()=>|/@])/g, "\\$1");
 };
 
 type NumberFieldState = {
@@ -223,12 +250,6 @@ const activateFormula = (
   }
 };
 
-type ContactEntry = {
-  id: string;
-  label: string;
-  value: string;
-};
-
 const buildContactPayload = (form: HTMLFormElement) => {
   const rawFormulaId = form.dataset.formula ?? "";
   const formulaId = rawFormulaId.trim();
@@ -240,37 +261,39 @@ const buildContactPayload = (form: HTMLFormElement) => {
   const formulaLabel = (form.dataset.formulaLabel ?? "").trim();
   const formData = new FormData(form);
 
-  const entries: ContactEntry[] = [];
+  const fields: Record<string, string> = {};
+  const entries: Array<{ id: string; label: string; value: string }> = [];
 
   formData.forEach((value, key) => {
-    const selector = `[name="${escapeSelector(key)}"]`;
-    const field = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
-      selector,
-    );
+    const trimmedKey = typeof key === "string" ? key.trim() : "";
+    if (!trimmedKey) {
+      return;
+    }
 
-    const rawLabel = field?.dataset.fieldLabel ?? key;
-    const label = rawLabel.trim() || key;
-    const rawValue =
+    const fieldElement = findFieldElement(form, trimmedKey);
+    const rawLabel = fieldElement?.dataset?.fieldLabel ?? trimmedKey;
+    const label = collapseWhitespace(rawLabel) || trimmedKey;
+
+    const baseValue =
       typeof value === "string"
-        ? value
+        ? collapseWhitespace(value)
         : value instanceof File
           ? value.name
           : value === undefined || value === null
             ? ""
-            : String(value);
+            : collapseWhitespace(String(value));
 
-    entries.push({
-      id: key,
-      label,
-      value: rawValue.trim(),
-    });
+    const formattedValue = isPhoneField(trimmedKey, label) ? formatPhoneValue(baseValue) : baseValue;
+
+    fields[label] = formattedValue;
+    entries.push({ id: trimmedKey, label, value: formattedValue });
   });
 
   return {
     formulaId,
     formulaLabel,
+    fields,
     entries,
-    pageUrl: window.location.href,
   };
 };
 
@@ -291,19 +314,14 @@ const buildContactRequest = (payload: ReturnType<typeof buildContactPayload>) =>
   };
 
   if (isCrossOrigin) {
-    const params = new URLSearchParams();
-    params.set("data", JSON.stringify(payload));
-    requestInit.body = params.toString();
-    requestInit.headers = {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    };
-    requestInit.mode = "no-cors";
-  } else {
-    requestInit.body = JSON.stringify(payload);
-    requestInit.headers = {
-      "Content-Type": "application/json",
-    };
+    requestInit.mode = "cors";
+    requestInit.credentials = "omit";
   }
+
+  requestInit.body = JSON.stringify(payload);
+  requestInit.headers = {
+    "Content-Type": "application/json",
+  };
 
   return { requestInit };
 };
@@ -343,7 +361,7 @@ const bindContactFormSubmission = (forms: HTMLFormElement[]) => {
         const { requestInit } = buildContactRequest(payload);
         const response = await fetch(CONTACT_ENDPOINT, requestInit);
 
-        if (!requestInit.mode && !response.ok) {
+        if (!response.ok) {
           const text = await response.text();
           throw new Error(text || "Réponse invalide du serveur");
         }

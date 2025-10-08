@@ -55,26 +55,18 @@ const submitCallbackForm = async (
     };
 
     if (isCrossOrigin) {
-      const searchParams = new URLSearchParams({
-        name: payload.name,
-        phone: payload.phone,
-        timestamp: new Date().toISOString(),
-      });
-      requestInit.body = searchParams.toString();
-      requestInit.headers = {
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-      };
-      requestInit.mode = "no-cors";
-    } else {
-      requestInit.body = JSON.stringify(payload);
-      requestInit.headers = {
-        "Content-Type": "application/json",
-      };
+      requestInit.mode = "cors";
+      requestInit.credentials = "omit";
     }
+
+    requestInit.body = JSON.stringify(payload);
+    requestInit.headers = {
+      "Content-Type": "application/json",
+    };
 
     const response = await fetch(CALLBACK_ENDPOINT, requestInit);
 
-    if (!requestInit.mode && !response.ok) {
+    if (!response.ok) {
       throw new Error(await response.text());
     }
 

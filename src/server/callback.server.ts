@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { appendSheetRow } from "./googleSheets";
 
 export const prerender = false;
 
@@ -8,18 +7,28 @@ interface Payload {
   phone?: string;
 }
 
+const callbackScriptUrl =
+  import.meta.env.GOOGLE_CALLBACK_SCRIPT_URL ??
+  import.meta.env.GOOGLE_APPS_SCRIPT_URL ??
+  process.env.GOOGLE_CALLBACK_SCRIPT_URL ??
+  process.env.GOOGLE_APPS_SCRIPT_URL;
+
 const parsePayload = async (request: Request): Promise<Payload> => {
   const contentType = request.headers.get("content-type") ?? "";
+  const rawBody = await request.text();
+
+  if (!rawBody) {
+    return {};
+  }
 
   if (contentType.includes("application/x-www-form-urlencoded")) {
-    const raw = await request.text();
-    const params = new URLSearchParams(raw);
+    const params = new URLSearchParams(rawBody);
     const dataParam = params.get("data");
 
     if (dataParam) {
       try {
         return JSON.parse(dataParam) as Payload;
-      } catch (error) {
+      } catch {
         throw new SyntaxError("Invalid JSON payload");
       }
     }
@@ -32,17 +41,17 @@ const parsePayload = async (request: Request): Promise<Payload> => {
     return body;
   }
 
-  return (await request.json()) as Payload;
+  try {
+    return JSON.parse(rawBody) as Payload;
+  } catch {
+    throw new SyntaxError("Invalid JSON payload");
+  }
 };
-
-const spreadsheetId = import.meta.env.GOOGLE_SHEET_ID ?? process.env.GOOGLE_SHEET_ID;
-const sheetName =
-  import.meta.env.GOOGLE_SHEET_TAB ?? process.env.GOOGLE_SHEET_TAB ?? "FormResponses";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    if (!spreadsheetId) {
-      throw new Error("Missing Google Sheets configuration");
+    if (!callbackScriptUrl) {
+      throw new Error("Missing Google Apps Script endpoint");
     }
 
     const body = await parsePayload(request);
@@ -59,12 +68,18 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const timestamp = new Date().toISOString();
-    await appendSheetRow({
-      spreadsheetId,
-      sheetName,
-      values: [timestamp, name, phone],
+    const response = await fetch(callbackScriptUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, phone }),
     });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || `Apps Script responded with ${response.status}`);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
