@@ -22,7 +22,7 @@ const { eyebrow, title, description, features } =
       features.map((feature) => (
         <article class="feature">
           <div class="feature__icon">
-            {feature.icon && <Icon type={feature.icon as any} />}
+            {feature.icon && <Icon type={feature.icon as any} size={48} />}
           </div>
           <h3>{feature.title}</h3>
           <p>{feature.description}</p>
@@ -60,8 +60,8 @@ const { eyebrow, title, description, features } =
       }
 
       &__icon :global(svg) {
-        width: var(--space-5);
-        height: var(--space-5);
+        width: var(--space-6);
+        height: var(--space-6);
         fill: var(--color-primary);
       }
       h3 {
