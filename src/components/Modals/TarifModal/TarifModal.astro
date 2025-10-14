@@ -4,6 +4,7 @@ import type { IconProps } from "@components/Icons/icon";
 import { replaceScopedClasses } from "@lib/htmlUtils";
 import type { TarifModalProps } from "@app-types/tarifs";
 import styles from "./tarifModal.module.scss";
+import tarifModalClientScript from "./tarifModal.client.js?url";
 
 const {
   id,
@@ -111,4 +112,4 @@ const iconEmpty = !defaultIcon && !defaultBadge;
   </div>
 </div>
 
-<script src="./tarifModal.client.ts"></script>
+<script type="module" src={tarifModalClientScript}></script>

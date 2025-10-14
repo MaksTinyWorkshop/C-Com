@@ -5,7 +5,7 @@ import { webcore } from "webcoreui/integration";
 import { rehypeBaseImages } from "./src/lib/rehypeBaseImages";
 
 const siteUrl = "https://makstinyworkshop.github.io";
-const siteBase = "/C-Com";
+const siteBase = "/C-Com"; // /C-Com
 
 export default defineConfig({
   site: siteUrl,

@@ -12,6 +12,7 @@ import type {
   TarifsSectionProps,
 } from "@app-types/tarifs";
 import styles from "./tarifs.module.scss";
+import tarifsClientScript from "./tarifs.client.js?url";
 
 type OptionConstraintConfig = OptionConstraint & {
   quantity: number;
@@ -359,5 +360,4 @@ const hasModal = Boolean(
     }
   </div>
 </section>
-
-<script src="./tarifs.client.ts"></script>
+<script type="module" src={tarifsClientScript}></script>
