@@ -15,12 +15,15 @@ const {
   defaultBadge = null,
 } = Astro.props as TarifModalProps & { defaultIcon?: IconProps["type"] | null };
 
-const processedFallbackContent = replaceScopedClasses(fallbackContent, styles) ?? "";
-const processedInitialContent = replaceScopedClasses(initialContent, styles) ?? "";
+const processedFallbackContent =
+  replaceScopedClasses(fallbackContent, styles) ?? "";
+const processedInitialContent =
+  replaceScopedClasses(initialContent, styles) ?? "";
 
 const trimmedInitialContent = processedInitialContent.trim()
   ? processedInitialContent
   : "";
+
 const encodedInitialPlanContent = trimmedInitialContent
   ? encodeURIComponent(trimmedInitialContent)
   : "";
@@ -37,6 +40,7 @@ const iconEmpty = !defaultIcon && !defaultBadge;
   data-default-plan={defaultPlan}
   data-default-badge={defaultBadge ?? ""}
   data-fallback-title={fallbackTitle}
+  data-fallback-content={processedFallbackContent}
   data-initial-plan-content={encodedInitialPlanContent}
 >
   <div
@@ -54,6 +58,7 @@ const iconEmpty = !defaultIcon && !defaultBadge;
     >
       ×
     </button>
+
     <header class={styles.modalHeader}>
       <div class={styles.modalIconGroup}>
         <div
@@ -74,22 +79,33 @@ const iconEmpty = !defaultIcon && !defaultBadge;
           }
         </div>
       </div>
+
       <h3 id={`${id}-title`} class={styles.srOnly} data-modal-title>
         {fallbackTitle}
       </h3>
     </header>
+
     <div class={styles.modalBody}>
-      {processedFallbackContent && (
-        <div class={styles.modalCommon} data-modal-common>
-          <Fragment set:html={processedFallbackContent} />
-        </div>
-      )}
+      <div
+        class={styles.modalCommon}
+        data-modal-common
+        data-has-content={processedFallbackContent ? "true" : undefined}
+      >
+        {
+          processedFallbackContent && (
+            <Fragment set:html={processedFallbackContent} />
+          )
+        }
+      </div>
+
       <div class={styles.modalPlanContent} data-modal-body>
-        {trimmedInitialContent ? (
-          <Fragment set:html={trimmedInitialContent} />
-        ) : (
-          <p>Aucune information complémentaire pour le moment.</p>
-        )}
+        {
+          trimmedInitialContent ? (
+            <Fragment set:html={trimmedInitialContent} />
+          ) : (
+            <p>Aucune information complémentaire pour le moment.</p>
+          )
+        }
       </div>
     </div>
   </div>

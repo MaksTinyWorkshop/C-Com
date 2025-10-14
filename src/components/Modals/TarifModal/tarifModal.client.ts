@@ -4,6 +4,7 @@ const MODAL_SELECTOR = "[data-tarif-modal-root]";
 const ICON_SELECTOR = "[data-modal-icon]";
 const TITLE_SELECTOR = "[data-modal-title]";
 const PLAN_CONTENT_SELECTOR = "[data-modal-body]";
+const COMMON_CONTENT_SELECTOR = "[data-modal-common]";
 const CLOSE_SELECTOR = "[data-modal-close]";
 
 const PLAN_CHANGE_EVENT = "tarif:plan-change";
@@ -13,9 +14,13 @@ const EMPTY_PLAN_CONTENT =
   "<p>Aucune information complémentaire pour le moment.</p>";
 
 const clonePlanIcon = (slug: string, iconContainer: HTMLElement) => {
-  const planIcon = document.querySelector<HTMLElement>(
-    `[data-plan-card][data-plan-slug="${slug}"] [data-plan-icon]`
-  );
+  const planIcon =
+    document.querySelector<HTMLElement>(
+      `[data-plan-trigger][data-plan-slug="${slug}"] [data-plan-icon]`
+    ) ??
+    document.querySelector<HTMLElement>(
+      `[data-plan-card][data-plan-slug="${slug}"] [data-plan-icon]`
+    );
 
   if (planIcon) {
     const clone = planIcon.cloneNode(true) as HTMLElement;
@@ -35,6 +40,7 @@ const initialiseModal = (modal: HTMLElement) => {
   const titleEl = modal.querySelector<HTMLElement>(TITLE_SELECTOR);
   const planContentEl = modal.querySelector<HTMLElement>(PLAN_CONTENT_SELECTOR);
   const iconEl = modal.querySelector<HTMLElement>(ICON_SELECTOR);
+  const commonContentEl = modal.querySelector<HTMLElement>(COMMON_CONTENT_SELECTOR);
   const closeButtons = modal.querySelectorAll<HTMLButtonElement>(CLOSE_SELECTOR);
 
   const fallbackTitle = modal.dataset.fallbackTitle ?? "";
@@ -50,12 +56,30 @@ const initialiseModal = (modal: HTMLElement) => {
     ? {
         slug: defaultPlan,
         badge: defaultBadge ? defaultBadge : null,
+        subtitle: null,
+        price: null,
+        footnote: null,
+        description: null,
         moreInfoTitle: null,
         moreInfoContent: initialPlanContent || null,
+        availableOptions: null,
       }
     : null;
 
   const render = (detail: PlanDetailPayload | null) => {
+    if (commonContentEl) {
+      const fallbackContent = modal.dataset.fallbackContent ?? "";
+      const trimmedFallback = fallbackContent.trim();
+      commonContentEl.innerHTML = trimmedFallback ? fallbackContent : "";
+      if (trimmedFallback) {
+        commonContentEl.dataset.hasContent = "true";
+        commonContentEl.hidden = false;
+      } else {
+        delete commonContentEl.dataset.hasContent;
+        commonContentEl.hidden = true;
+      }
+    }
+
     if (titleEl) {
       titleEl.textContent = detail?.moreInfoTitle ?? fallbackTitle;
     }

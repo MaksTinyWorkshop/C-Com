@@ -33,6 +33,7 @@ const tarifsPlanSchema = z.object({
   description: z.string().optional(),
   moreInfoTitle: z.string().optional(),
   moreInfoContent: z.string().optional(),
+  availableOptions: z.array(z.string()).optional(),
 });
 
 const tarifsSchema = z.object({

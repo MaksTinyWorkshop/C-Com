@@ -10,6 +10,7 @@ export interface Plan {
   description?: string;
   moreInfoTitle?: string;
   moreInfoContent?: string;
+  availableOptions?: string[];
 }
 
 export interface Option {
@@ -37,8 +38,13 @@ export interface ModalContent {
 export interface PlanConfig {
   slug: string;
   badge: string | null;
+  subtitle: string | null;
+  price: string | null;
+  footnote: string | null;
+  description: string | null;
   moreInfoTitle: string | null;
   moreInfoContent: string | null;
+  availableOptions: string[] | null;
 }
 
 export interface OptionConstraint {
@@ -60,8 +66,13 @@ export interface TarifClientConfig {
 export interface PlanDetailPayload {
   slug: string;
   badge: string | null;
+  subtitle: string | null;
+  price: string | null;
+  footnote: string | null;
+  description: string | null;
   moreInfoTitle: string | null;
   moreInfoContent: string | null;
+  availableOptions: string[] | null;
 }
 
 export interface TarifModalProps {

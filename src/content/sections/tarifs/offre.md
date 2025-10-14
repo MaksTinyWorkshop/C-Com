@@ -15,6 +15,7 @@ plans:
         <li>Vidéos ou visuels statiques fournis par le client dans le format requis par C'Com
         </li>
       </ul>
+    availableOptions: []
   - slug: ccom
     icon: ccom-ccom
     subtitle: "Tarif diffusion"
@@ -29,6 +30,8 @@ plans:
           Création visuel statique (<span class={styles.bold}>150€ ht</span> par création produite par C'Com)
           </li>
         </ul>
+    availableOptions:
+      - static
       
   - slug: cpro
     icon: ccom-cpro
@@ -50,6 +53,10 @@ plans:
         Création d'une vidéo drone | motion design (<span class={styles.bold}>Sur devis</span> uniquement)
           </li>
         </ul>
+    availableOptions:
+      - static
+      - video-standard
+      - video-premium
 options:
   - id: static
     label: "Le visuel statique*"

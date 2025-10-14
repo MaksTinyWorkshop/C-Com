@@ -1,6 +1,6 @@
 ---
 import Navbar from "@components/UI/Navbar/Navbar.astro";
-import CallbackModal from "@components/Modals/CallbackModal/CallbackModal.astro";
+import TarifModal from "@components/Modals/TarifModal/TarifModal.astro";
 import SiteFooter from "@components/UI/Footer/SiteFooter.astro";
 import type { BaseLayoutProps } from "@app-types/layout";
 
@@ -25,6 +25,14 @@ const {
       <slot />
     </main>
     <SiteFooter />
+    <TarifModal
+      id="global-tarif-modal"
+      fallbackTitle="Plus d'informations"
+      fallbackContent=""
+      defaultPlan=""
+      defaultIcon={undefined}
+      defaultBadge={undefined}
+    />
   </body>
 </html>
 

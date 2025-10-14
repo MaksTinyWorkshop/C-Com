@@ -1,6 +1,5 @@
 ---
 import Icon from "@components/Icons/Icon.astro";
-import TarifModal from "@components/Modals/TarifModal/TarifModal.astro";
 import modalStyles from "@components/Modals/TarifModal/tarifModal.module.scss";
 import { replaceScopedClasses } from "@lib/htmlUtils";
 import type {
@@ -25,6 +24,42 @@ const planMap = new Map(planEntries.map((plan) => [plan.slug, plan]));
 const resolvedDefaultPlan = planMap.has(props.defaultPlan)
   ? props.defaultPlan
   : (planEntries[0]?.slug ?? "");
+
+const resolvePlanLabel = (plan: Plan) => {
+  if (plan.badge && plan.badge.trim()) {
+    return plan.badge.trim();
+  }
+
+  if (plan.slug && plan.slug.trim()) {
+    const normalized = plan.slug.trim().replace(/[-_]/g, " ").toUpperCase();
+    if (
+      normalized.startsWith("C") &&
+      normalized.length > 1 &&
+      normalized.charAt(1) !== "'"
+    ) {
+      return `C'${normalized.slice(1)}`;
+    }
+    return normalized;
+  }
+
+  if (
+    plan.subtitle &&
+    plan.subtitle.trim() &&
+    plan.subtitle.trim().length <= 24
+  ) {
+    return plan.subtitle.trim();
+  }
+
+  return "Plan";
+};
+
+const getPlanLabel = (slug: string) => {
+  const plan = planMap.get(slug);
+  if (!plan) {
+    return slug.replace(/[-_]/g, " ").toUpperCase();
+  }
+  return resolvePlanLabel(plan);
+};
 
 const baseOptionIds = props.options
   .filter((opt) => (opt.type ?? "extra") === "base")
@@ -68,14 +103,16 @@ const componentId = `tarifs-${Math.random().toString(36).slice(2, 10)}`;
 const modalId = `${componentId}-modal`;
 
 const defaultPlanEntry = planMap.get(resolvedDefaultPlan);
-const defaultPlanIcon = defaultPlanEntry?.icon ?? null;
 const defaultPlanBadge = defaultPlanEntry?.badge ?? null;
+const defaultPlanLabel = getPlanLabel(resolvedDefaultPlan);
 
 const modalSharedContent =
   replaceScopedClasses(props.modal?.content ?? "", modalStyles) ?? "";
 const initialPlanDetailContent =
   replaceScopedClasses(defaultPlanEntry?.moreInfoContent ?? "", modalStyles) ??
   "";
+
+const modalFallbackTitle = props.modal?.title ?? "Plus d'informations";
 
 const clientConfig: TarifClientConfig = {
   defaultPlan: resolvedDefaultPlan,
@@ -90,14 +127,21 @@ const clientConfig: TarifClientConfig = {
         max: constraint.max,
         step: constraint.step,
       },
-    ]),
+    ])
   ),
   plans: planEntries.map<PlanConfig>((plan) => ({
     slug: plan.slug,
     badge: plan.badge ?? null,
+    subtitle: plan.subtitle ?? null,
+    price: plan.price ?? null,
+    footnote: plan.footnote ?? null,
+    description: plan.description ?? null,
     moreInfoTitle: plan.moreInfoTitle ?? null,
     moreInfoContent:
       replaceScopedClasses(plan.moreInfoContent ?? null, modalStyles) ?? null,
+    availableOptions: Array.isArray(plan.availableOptions)
+      ? plan.availableOptions
+      : null,
   })),
   modal: props.modal ?? null,
 };
@@ -115,41 +159,77 @@ const hasModal = Boolean(
   data-tarifs-root
   data-config={configPayload}
   data-modal-id={hasModal ? modalId : undefined}
+  data-fallback-title={modalFallbackTitle}
+  data-fallback-content={modalSharedContent}
+  data-default-plan={resolvedDefaultPlan}
+  data-initial-content={initialPlanDetailContent}
 >
   <div class={styles.shell}>
     <div class={styles.planDecor}>
       <div class={styles.planDeck}>
-        {
-          planEntries.map((plan) => (
-            <article
-              class={styles.planCard}
-              data-plan-card
-              data-plan-slug={plan.slug}
-              data-active={plan.slug === resolvedDefaultPlan ? "true" : "false"}
-            >
-              <div class={styles.planBadge}>
-                {plan.icon && (
-                  <span class={styles.planIcon} data-plan-icon>
-                    <Icon type={plan.icon} size={64} />
-                  </span>
-                )}
-                {plan.badge && (
-                  <span class={styles.planBadgeText}>{plan.badge}</span>
-                )}
-              </div>
-              {plan.subtitle && (
-                <p class={styles.planSubtitle}>{plan.subtitle}</p>
-              )}
-              <p class={styles.planPrice}>{plan.price}</p>
-              {plan.footnote && (
-                <p class={styles.planFootnote}>{plan.footnote}</p>
-              )}
-              {plan.description && (
-                <p class={styles.planDescription}>{plan.description}</p>
-              )}
-            </article>
-          ))
-        }
+        <article
+          class={styles.planCard}
+          data-plan-card
+          data-active-plan={resolvedDefaultPlan}
+        >
+          <div class={styles.planSwitch} data-plan-switch>
+            {
+              planEntries.map((plan) => {
+                const label = resolvePlanLabel(plan);
+                return (
+                  <button
+                    type="button"
+                    class={styles.planIconButton}
+                    data-plan-trigger
+                    data-plan-slug={plan.slug}
+                    data-active={
+                      plan.slug === resolvedDefaultPlan ? "true" : "false"
+                    }
+                    aria-label={`Choisir l'offre ${label}`}
+                    aria-pressed={
+                      plan.slug === resolvedDefaultPlan ? "true" : "false"
+                    }
+                  >
+                    <span class={styles.planIconBadge} data-plan-icon>
+                      {plan.icon ? (
+                        <Icon type={plan.icon} size={56} />
+                      ) : (
+                        <span>{label}</span>
+                      )}
+                    </span>
+                  </button>
+                );
+              })
+            }
+          </div>
+
+          <div
+            class={styles.planBadge}
+            data-plan-badge
+            hidden={!defaultPlanBadge}
+          >
+            <span class={styles.planBadgeText} data-plan-badge-text>
+              {defaultPlanBadge ?? ""}
+            </span>
+          </div>
+
+          <p class={styles.planSubtitle} data-plan-subtitle>
+            {defaultPlanEntry?.subtitle ?? ""}
+          </p>
+          <p class={styles.planPrice} data-plan-price>
+            {defaultPlanEntry?.price ?? ""}
+          </p>
+          <p
+            class={styles.planFootnote}
+            data-plan-footnote
+            hidden={!defaultPlanEntry?.footnote}
+          >
+            {defaultPlanEntry?.footnote ?? ""}
+          </p>
+          <p class={styles.planDiffusion} data-plan-diffusion>
+            {defaultPlanEntry?.description ?? ""}
+          </p>
+        </article>
       </div>
     </div>
 
@@ -190,6 +270,7 @@ const hasModal = Boolean(
                 data-option-type={optionType}
                 data-selected={selected ? "true" : "false"}
                 data-disabled={disabled ? "true" : "false"}
+                data-originally-disabled={disabled ? "true" : "false"}
                 data-quantity={quantity}
                 data-min={constraint.min}
                 data-max={
@@ -277,20 +358,6 @@ const hasModal = Boolean(
       )
     }
   </div>
-
-  {
-    hasModal && (
-      <TarifModal
-        id={modalId}
-        fallbackTitle={props.modal?.title ?? "Plus d'informations"}
-        fallbackContent={modalSharedContent}
-        defaultPlan={resolvedDefaultPlan}
-        initialContent={initialPlanDetailContent}
-        defaultIcon={defaultPlanIcon ?? undefined}
-        defaultBadge={defaultPlanBadge ?? undefined}
-      />
-    )
-  }
 </section>
 
 <script src="./tarifs.client.ts"></script>

@@ -9,7 +9,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
-  z-index: 999;
+  
 }
 
 .modalBackdrop[data-open="true"] {
@@ -30,6 +30,7 @@
   transform: translateY(24px);
   transition: transform 0.3s ease;
   position: relative;
+  z-index: 9999 !important;
 
   .modalClose {
     position: absolute;
@@ -114,6 +115,7 @@
   flex-direction: column;
   text-align: justify;
   font-size: var(--step--1);
+  z-index: 9999 ;
 
   &:where(p, ul, ol) {
   margin: 0;

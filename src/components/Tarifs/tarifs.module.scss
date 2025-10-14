@@ -1,7 +1,6 @@
 .tarifs {
-  height: calc(100vh - var(--navbar-total-height));
+  height: calc(100dvh - var(--navbar-total-height));
   position: relative;
-  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,58 +22,134 @@
 
     .planDeck {
     position: relative;
+    display: flex;
+    justify-content: center;
 
       .planCard {
-      display: none;
+      display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: var(--space-2);
+      padding: var(--space-3);
       border-radius: var(--radius-4xl);
       background: var(--color-base-100);
       color: var(--color-primary);
+      border: 3px solid transparent;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+      max-width: 420px;
+      width: min(100%, 420px);
 
-        &[data-active="true"] {
-          display: flex;
+        .planSwitch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        width: 100%;
+        margin-bottom: var(--space-2);
+        }
+
+        .planIconButton {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-1);
+        background: transparent;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        outline: none;
+        transition: transform 0.2s ease;
+
+          &:focus-visible {
+            outline: 3px solid rgba(91, 0, 154, 0.35);
+            outline-offset: 4px;
+          }
+
+          &:hover {
+            transform: translateY(-2px);
+          }
+
+          &[data-active="true"] .planIconBadge {
+            background: var(--color-secondary);
+            color: var(--color-primary);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+          }
+
+          &[data-active="true"] .planIconLabel {
+            color: var(--color-primary);
+          }
+        }
+
+        .planIconBadge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: clamp(3.75rem, 9vw, 4.5rem);
+        height: clamp(3.75rem, 9vw, 4.5rem);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--color-base-100);
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+
+          svg,
+          span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
+        .planIconLabel {
+        font-size: var(--step--2);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--color-neutral-content);
+        }
+
+        .planBadge[hidden] {
+          display: none;
         }
 
         .planBadge {
         display: inline-flex;
         align-items: center;
-        gap: var(--space-1);
+        justify-content: center;
+        }
 
-          .planIcon {
+        .planBadgeText {
           display: inline-flex;
-          } 
+          align-items: center;
+          justify-content: center;
+          padding: 0.25rem 0.75rem;
+          border-radius: 999px;
+          font-size: var(--step--2);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          background: var(--color-secondary);
+          color: var(--color-primary);
+        }
 
-          .planBadgeText {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-size: var(--step--2);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            background: var(--color-secondary);
-            color: var(--color-primary);
-          }
-        
+        .planTitle {
+        margin: 0;
+        font-size: var(--step--1);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--color-primary);
         }
 
         .planSubtitle,
         .planPrice,
         .planFootnote,
-        .planDescription {
+        .planDiffusion {
           text-align: center;
-          color: var(--color-base-content);
           margin: 0;
         }
 
         .planSubtitle {
-          padding: var(--space-1) 0;
-          font-weight: 100;
+          font-weight: 300;
           font-size: var(--step--2);
           color: var(--color-neutral-content);
         }
@@ -82,12 +157,17 @@
         .planPrice {
           font-size: var(--step-2);
           font-weight: 700;
-          padding-bottom: var(--space-1);
+          color: var(--color-primary);
         }
 
-        .planFootnote, .planDescription {
+        .planFootnote {
           font-size: var(--step--2);
-          
+          color: var(--color-neutral-content);
+        }
+
+        .planDiffusion {
+          font-size: var(--step--1);
+          color: var(--color-base-content);
         }
       }
     }
@@ -216,6 +296,13 @@
   }
 }
 
+.optionCard[data-disabled="true"] {
+  opacity: 0.55;
+  filter: grayscale(0.1);
+  cursor: not-allowed;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 .optionCard[data-counter-enabled="false"] .optionPrice,
 .optionCard[data-counter-enabled="false"] .optionLabel,
 .optionCard[data-counter-enabled="false"] .optionDescription {
@@ -262,7 +349,12 @@
   }
 }
 
-
+@media (min-width: 640px) {
+  .tarifs {
+    height: auto;
+    padding-bottom: var(--space-3);
+  }
+}
 
 
 
