@@ -83,6 +83,7 @@ export interface TarifModalProps {
   initialContent?: string;
   defaultIcon?: string | null;
   defaultBadge?: string | null;
+  iconSize?: number;
 }
 
 export interface TarifsSectionProps {

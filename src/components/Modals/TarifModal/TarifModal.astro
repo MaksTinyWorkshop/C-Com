@@ -14,7 +14,13 @@ const {
   initialContent,
   defaultIcon = null,
   defaultBadge = null,
+  iconSize = 96,
 } = Astro.props as TarifModalProps & { defaultIcon?: IconProps["type"] | null };
+
+const resolvedIconSize =
+  typeof iconSize === "number" && Number.isFinite(iconSize) && iconSize > 0
+    ? iconSize
+    : 72;
 
 const processedFallbackContent =
   replaceScopedClasses(fallbackContent, styles) ?? "";
@@ -43,6 +49,7 @@ const iconEmpty = !defaultIcon && !defaultBadge;
   data-fallback-title={fallbackTitle}
   data-fallback-content={processedFallbackContent}
   data-initial-plan-content={encodedInitialPlanContent}
+  data-icon-size={String(resolvedIconSize)}
 >
   <div
     class={styles.modal}
@@ -71,7 +78,11 @@ const iconEmpty = !defaultIcon && !defaultBadge;
         >
           {
             defaultIcon ? (
-              <Icon type={defaultIcon} size={72} aria-hidden="true" />
+              <Icon
+                type={defaultIcon}
+                size={resolvedIconSize}
+                aria-hidden="true"
+              />
             ) : defaultBadge ? (
               <span>{defaultBadge}</span>
             ) : (

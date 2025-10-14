@@ -13,7 +13,54 @@ const MODAL_OPEN_EVENT = "tarif:modal-open";
 const EMPTY_PLAN_CONTENT =
   "<p>Aucune information complémentaire pour le moment.</p>";
 
-const clonePlanIcon = (slug: string, iconContainer: HTMLElement) => {
+const DEFAULT_ICON_SIZE = 72;
+
+const parseIconSize = (modal: HTMLElement): number => {
+  const attr = modal.dataset.iconSize ?? "";
+  const parsed = Number(attr);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+  return DEFAULT_ICON_SIZE;
+};
+
+const applyIconSize = (iconContainer: HTMLElement, size: number) => {
+  const svg = iconContainer.querySelector<SVGElement>("svg");
+  if (!svg) {
+    return;
+  }
+
+  const targetWidth = size;
+  let targetHeight: number | null = null;
+  const viewBox = svg.getAttribute("viewBox");
+  if (viewBox) {
+    const parts = viewBox.trim().split(/\s+/).map(Number);
+    if (parts.length >= 4 && Number.isFinite(parts[2]) && parts[2] > 0 && Number.isFinite(parts[3])) {
+      const ratio = parts[3] / parts[2];
+      if (Number.isFinite(ratio) && ratio > 0) {
+        targetHeight = targetWidth * ratio;
+      }
+    }
+  }
+
+  svg.setAttribute("width", String(targetWidth));
+  svg.style.width = `${targetWidth}px`;
+
+  if (targetHeight && Number.isFinite(targetHeight)) {
+    const roundedHeight = Math.round(targetHeight * 100) / 100;
+    svg.setAttribute("height", String(roundedHeight));
+    svg.style.height = `${roundedHeight}px`;
+  } else {
+    svg.removeAttribute("height");
+    svg.style.height = "auto";
+  }
+};
+
+const clonePlanIcon = (
+  slug: string,
+  iconContainer: HTMLElement,
+  iconSize: number
+) => {
   const planIcon =
     document.querySelector<HTMLElement>(
       `[data-plan-trigger][data-plan-slug="${slug}"] [data-plan-icon]`
@@ -28,6 +75,7 @@ const clonePlanIcon = (slug: string, iconContainer: HTMLElement) => {
     clone.setAttribute("aria-hidden", "true");
     iconContainer.innerHTML = "";
     iconContainer.appendChild(clone);
+    applyIconSize(iconContainer, iconSize);
     iconContainer.setAttribute("aria-hidden", "true");
     iconContainer.removeAttribute("data-empty");
     return true;
@@ -47,6 +95,7 @@ const initialiseModal = (modal: HTMLElement) => {
   const defaultPlan = modal.dataset.defaultPlan ?? "";
   const defaultBadge = modal.dataset.defaultBadge ?? "";
   const initialPlanContentEncoded = modal.dataset.initialPlanContent ?? "";
+  const iconSize = parseIconSize(modal);
   const initialPlanContent = initialPlanContentEncoded
     ? decodeURIComponent(initialPlanContentEncoded)
     : "";
@@ -98,7 +147,7 @@ const initialiseModal = (modal: HTMLElement) => {
         delete iconEl.dataset.plan;
       }
 
-      const cloned = detail ? clonePlanIcon(detail.slug, iconEl) : false;
+      const cloned = detail ? clonePlanIcon(detail.slug, iconEl, iconSize) : false;
       if (!cloned) {
         const fallbackText =
           detail?.badge || detail?.slug || fallbackTitle || "";
@@ -106,6 +155,7 @@ const initialiseModal = (modal: HTMLElement) => {
         iconEl.textContent = fallbackText;
         iconEl.removeAttribute("aria-hidden");
         iconEl.setAttribute("data-empty", "true");
+        applyIconSize(iconEl, iconSize);
       } else {
         iconEl.removeAttribute("data-empty");
       }

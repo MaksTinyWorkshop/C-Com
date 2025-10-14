@@ -1,5 +1,5 @@
 .tarifs {
-  height: calc(100dvh - var(--navbar-total-height));
+  padding-bottom: var(--space-3);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   padding: var(--space-3) var(--space-4);
-  gap: var(--space-2);
+  height: 100%;
 
   .planDecor {
   position: relative;
@@ -30,7 +30,7 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: var(--space-3);
+      padding: var(--space-2);
       border-radius: var(--radius-4xl);
       background: var(--color-base-100);
       color: var(--color-primary);
@@ -45,7 +45,7 @@
         justify-content: center;
         gap: var(--space-2);
         width: 100%;
-        margin-bottom: var(--space-2);
+        margin-bottom: var(--space-1);
         }
 
         .planIconButton {
@@ -178,7 +178,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: var(--space-3);
 }
 
 .optionsTitle {
@@ -191,7 +190,7 @@
 .optionStack {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 
   &:last-child {
     display: flex;
@@ -352,7 +351,6 @@
 @media (min-width: 640px) {
   .tarifs {
     height: auto;
-    padding-bottom: var(--space-3);
   }
 }
 

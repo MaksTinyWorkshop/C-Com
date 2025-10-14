@@ -7,7 +7,46 @@ const CLOSE_SELECTOR = "[data-modal-close]";
 const PLAN_CHANGE_EVENT = "tarif:plan-change";
 const MODAL_OPEN_EVENT = "tarif:modal-open";
 const EMPTY_PLAN_CONTENT = "<p>Aucune information complémentaire pour le moment.</p>";
-const clonePlanIcon = (slug, iconContainer) => {
+const DEFAULT_ICON_SIZE = 72;
+const parseIconSize = (modal) => {
+    var _a;
+    const attr = (_a = modal.dataset.iconSize) !== null && _a !== void 0 ? _a : "";
+    const parsed = Number(attr);
+    if (Number.isFinite(parsed) && parsed > 0) {
+        return parsed;
+    }
+    return DEFAULT_ICON_SIZE;
+};
+const applyIconSize = (iconContainer, size) => {
+    const svg = iconContainer.querySelector("svg");
+    if (!svg) {
+        return;
+    }
+    const targetWidth = size;
+    let targetHeight = null;
+    const viewBox = svg.getAttribute("viewBox");
+    if (viewBox) {
+        const parts = viewBox.trim().split(/\s+/).map(Number);
+        if (parts.length >= 4 && Number.isFinite(parts[2]) && parts[2] > 0 && Number.isFinite(parts[3])) {
+            const ratio = parts[3] / parts[2];
+            if (Number.isFinite(ratio) && ratio > 0) {
+                targetHeight = targetWidth * ratio;
+            }
+        }
+    }
+    svg.setAttribute("width", String(targetWidth));
+    svg.style.width = `${targetWidth}px`;
+    if (targetHeight && Number.isFinite(targetHeight)) {
+        const roundedHeight = Math.round(targetHeight * 100) / 100;
+        svg.setAttribute("height", String(roundedHeight));
+        svg.style.height = `${roundedHeight}px`;
+    }
+    else {
+        svg.removeAttribute("height");
+        svg.style.height = "auto";
+    }
+};
+const clonePlanIcon = (slug, iconContainer, iconSize) => {
     var _a;
     const planIcon = (_a = document.querySelector(`[data-plan-trigger][data-plan-slug="${slug}"] [data-plan-icon]`)) !== null && _a !== void 0 ? _a : document.querySelector(`[data-plan-card][data-plan-slug="${slug}"] [data-plan-icon]`);
     if (planIcon) {
@@ -16,6 +55,7 @@ const clonePlanIcon = (slug, iconContainer) => {
         clone.setAttribute("aria-hidden", "true");
         iconContainer.innerHTML = "";
         iconContainer.appendChild(clone);
+        applyIconSize(iconContainer, iconSize);
         iconContainer.setAttribute("aria-hidden", "true");
         iconContainer.removeAttribute("data-empty");
         return true;
@@ -33,6 +73,7 @@ const initialiseModal = (modal) => {
     const defaultPlan = (_b = modal.dataset.defaultPlan) !== null && _b !== void 0 ? _b : "";
     const defaultBadge = (_c = modal.dataset.defaultBadge) !== null && _c !== void 0 ? _c : "";
     const initialPlanContentEncoded = (_d = modal.dataset.initialPlanContent) !== null && _d !== void 0 ? _d : "";
+    const iconSize = parseIconSize(modal);
     const initialPlanContent = initialPlanContentEncoded
         ? decodeURIComponent(initialPlanContentEncoded)
         : "";
@@ -81,13 +122,14 @@ const initialiseModal = (modal) => {
             else {
                 delete iconEl.dataset.plan;
             }
-            const cloned = detail ? clonePlanIcon(detail.slug, iconEl) : false;
+            const cloned = detail ? clonePlanIcon(detail.slug, iconEl, iconSize) : false;
             if (!cloned) {
                 const fallbackText = (detail === null || detail === void 0 ? void 0 : detail.badge) || (detail === null || detail === void 0 ? void 0 : detail.slug) || fallbackTitle || "";
                 iconEl.innerHTML = "";
                 iconEl.textContent = fallbackText;
                 iconEl.removeAttribute("aria-hidden");
                 iconEl.setAttribute("data-empty", "true");
+                applyIconSize(iconEl, iconSize);
             }
             else {
                 iconEl.removeAttribute("data-empty");
