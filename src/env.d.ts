@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   readonly PUBLIC_CALLBACK_ENDPOINT?: string;
   readonly PUBLIC_CONTACT_ENDPOINT?: string;
+  readonly PUBLIC_CONTACT_SUBMIT_MODE?: string;
+  readonly PUBLIC_CONTACT_SUBMIT_EXTRA_PARAMS?: string;
   readonly GOOGLE_APPS_SCRIPT_URL?: string;
   readonly GOOGLE_CALLBACK_SCRIPT_URL?: string;
   readonly GOOGLE_CONTACT_SCRIPT_URL?: string;

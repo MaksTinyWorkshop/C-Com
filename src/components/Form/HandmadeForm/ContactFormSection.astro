@@ -31,6 +31,7 @@ const initialFormula =
 
 const formatPlaceholder = (field: FormField, isRequired: boolean) =>
   field.placeholder ?? `${field.label}${isRequired ? "*" : ""}`;
+
 ---
 
 {
@@ -79,11 +80,32 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
           </div>
 
           {formulas.map((formula) => {
+            const formulaSubmissionEntry =
+              typeof formula.submissionName === "string" &&
+              formula.submissionName.trim().length > 0
+                ? formula.submissionName.trim()
+                : undefined;
+            const formulaSubmissionValue =
+              typeof formula.submissionValue === "string" &&
+              formula.submissionValue.trim().length > 0
+                ? formula.submissionValue.trim()
+                : formula.label;
+
             const renderField = (field: FormField) => {
               const fieldId = `contact-${formula.id}-${field.id}`;
               const fieldType = field.type ?? "text";
               const isRequired = field.required !== false;
               const placeholder = formatPlaceholder(field, isRequired);
+              const submissionName =
+                typeof field.submissionName === "string" &&
+                field.submissionName.trim().length > 0
+                  ? field.submissionName.trim()
+                  : undefined;
+              const submissionValue =
+                typeof field.submissionValue === "string" &&
+                field.submissionValue.trim().length > 0
+                  ? field.submissionValue.trim()
+                  : undefined;
 
               const isNumberField = fieldType === "number";
               const fieldClass = `form-field${isNumberField ? " form-field--number" : ""}`;
@@ -105,6 +127,8 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                         placeholder={placeholder}
                         required={isRequired}
                         data-field-label={field.label}
+                        data-submission-name={submissionName}
+                        data-submission-value={submissionValue}
                       />
                     </div>
                   );
@@ -121,13 +145,25 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                           name={field.id}
                           required={isRequired}
                           data-field-label={field.label}
+                          data-submission-name={submissionName}
+                          data-submission-value={submissionValue}
                         >
                           <option value="" disabled selected>
                             {placeholder}
                           </option>
                           {field.options?.map((option) => (
-                            <option value={option.value}>{option.label}</option>
-                          ))}
+                            <option
+                              value={option.value}
+                              data-submission-value={
+                                option.submissionValue &&
+                                option.submissionValue.trim().length > 0
+                                  ? option.submissionValue.trim()
+                                  : option.label.trim()
+                              }
+                            >
+                              {option.label}
+                            </option>
+                          )) ?? null}
                         </select>
                         <span class="select-icon">
                           <Icon type="chevron-down" size={16} />
@@ -182,6 +218,8 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                           placeholder={placeholder}
                           required={isRequired}
                           data-field-label={field.label}
+                          data-submission-name={submissionName}
+                          data-submission-value={submissionValue}
                         />
                         <button
                           type="button"
@@ -209,6 +247,8 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                         placeholder={placeholder}
                         required={isRequired}
                         data-field-label={field.label}
+                        data-submission-name={submissionName}
+                        data-submission-value={submissionValue}
                       />
                     </div>
                   );
@@ -246,6 +286,8 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
                 data-formula-fields
                 data-formula={formula.id}
                 data-formula-label={formula.label}
+                data-formula-entry={formulaSubmissionEntry}
+                data-formula-value={formulaSubmissionValue}
                 method="post"
               >
                 <div class="form-groups">
@@ -283,7 +325,30 @@ const formatPlaceholder = (field: FormField, isRequired: boolean) =>
           })}
         </div>
       </div>
-      <script src="./form.client.ts" />
+      <script src="./form.submit.ts" />
+      <script src="./form.logic.ts" />
+
+
+<script>
+  import { submitToGoogleForm } from "./form.submit";
+  import { initialiseNumberField } from "./form.logic";
+  import { initContactForm } from "./form.logic";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const section = document.querySelector("[data-contact-section]");
+    if (section) initContactForm(section);
+    document.querySelectorAll("[data-number-field]").forEach(initialiseNumberField);
+
+    document.querySelectorAll("form[data-formula-fields]").forEach((form) => {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await submitToGoogleForm(e.currentTarget);
+      });
+    });
+  });
+</script>
+
+
     </section>
   )
 }

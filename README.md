@@ -69,6 +69,8 @@ Exemple de `.env`
 ```
 PUBLIC_CALLBACK_ENDPOINT=/api/callback
 PUBLIC_CONTACT_ENDPOINT=/api/contact
+# PUBLIC_CONTACT_SUBMIT_MODE=google-form
+# PUBLIC_CONTACT_SUBMIT_EXTRA_PARAMS=fvv=1&pageHistory=0&submit=Submit
 
 # URL de base (facultatif) si un seul script reçoit tous les formulaires
 # GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/AKfycbydUevMwKp82maH7byYp2XefTYfJmtaatLeocsq93H0Umm59aY23slC0BcGhZRfpqhi/exec
@@ -78,5 +80,5 @@ PUBLIC_CONTACT_ENDPOINT=/api/contact
 # GOOGLE_CONTACT_SCRIPT_URL=https://script.google.com/macros/s/EXEMPLE_CONTACT/exec
 ```
 
+Pour un envoi direct vers un Google Form, définissez `PUBLIC_CONTACT_ENDPOINT` avec l'URL `formResponse`, ajoutez `PUBLIC_CONTACT_SUBMIT_MODE=google-form` et, si besoin, complétez `PUBLIC_CONTACT_SUBMIT_EXTRA_PARAMS` avec les paramètres exigés par Google (`fvv`, `pageHistory`, `submit`, `fbzx`, etc.). Chaque champ du frontmatter peut recevoir une clef `submissionName` (et éventuellement `submissionValue`) afin de mapper vos identifiants internes (`lastName`, `company`, …) vers les identifiants `entry.xxxxx` attendus par Google Forms ; les propriétés `submissionName`/`submissionValue` au niveau de la formule permettent d'envoyer la valeur associée à la formule sélectionnée.
 
-Ce boilerplate est volontairement simple pour faciliter la prise en main. N'hésitez pas à l'adapter : intégration CMS, formulaires, animations, Tailwind, etc.

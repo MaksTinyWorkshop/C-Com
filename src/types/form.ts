@@ -15,7 +15,13 @@ export interface FormField {
   min?: number;
   max?: number;
   step?: number;
-  options?: { label: string; value: string }[];
+  options?: {
+    label: string;
+    value: string;
+    submissionValue?: string;
+  }[];
+  submissionName?: string;
+  submissionValue?: string;
 }
 
 export interface FormFormula {
@@ -24,6 +30,8 @@ export interface FormFormula {
   description?: string;
   helper?: string;
   submitLabel?: string;
+  submissionName?: string;
+  submissionValue?: string;
   fields: FormField[];
 }
 

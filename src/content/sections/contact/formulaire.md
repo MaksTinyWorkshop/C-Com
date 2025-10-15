@@ -2,6 +2,7 @@
 component: contact-form
 title: "Contactez-nous !"
 subtitle: "Choisissez la formule qui correspond à votre projet et partagez-nous vos informations pour être recontacté rapidement."
+
 formulas:
   - id: csimple
     label: "C'SIMPLE"
@@ -20,14 +21,14 @@ formulas:
         type: tel
       - id: company
         label: "Structure"
-      - id: city
-        label: "Ville"
-      - id: postalCode
-        label: "Code postal"
-      - id: address
-        label: "Adresse"
       - id: industry
         label: "Secteur d'activité"
+      - id: address
+        label: "Adresse"
+      - id: postalCode
+        label: "Code postal"
+      - id: city
+        label: "Ville"
       - id: siret
         label: "Numéro de SIRET"
       - id: commitmentDuration
@@ -45,6 +46,7 @@ formulas:
         type: textarea
         placeholder: "Précisez vos besoins"
         required: false
+
   - id: ccom
     label: "C'COM"
     description: "La solution idéale pour déléguer la création de vos visuels et animer vos écrans toute l'année."
@@ -62,14 +64,14 @@ formulas:
         type: tel
       - id: company
         label: "Structure"
-      - id: city
-        label: "Ville"
-      - id: postalCode
-        label: "Code postal"
-      - id: address
-        label: "Adresse"
       - id: industry
         label: "Secteur d'activité"
+      - id: address
+        label: "Adresse"
+      - id: postalCode
+        label: "Code postal"
+      - id: city
+        label: "Ville"
       - id: siret
         label: "Numéro de SIRET"
       - id: commitmentDuration
@@ -88,17 +90,12 @@ formulas:
         required: false
         min: 0
         step: 1
-      - id: videos
-        label: "Vidéo(s)"
-        type: number
-        required: false
-        min: 0
-        step: 1
       - id: customRequest
         label: "Demande particulière"
         type: textarea
         placeholder: "Précisez vos besoins"
         required: false
+
   - id: cpro
     label: "C'PRO"
     description: "Un accompagnement sur-mesure pour vos campagnes vidéo, motion design ou drone."
@@ -116,14 +113,14 @@ formulas:
         type: tel
       - id: company
         label: "Structure"
-      - id: city
-        label: "Ville"
-      - id: postalCode
-        label: "Code postal"
-      - id: address
-        label: "Adresse"
       - id: industry
         label: "Secteur d'activité"
+      - id: address
+        label: "Adresse"
+      - id: postalCode
+        label: "Code postal"
+      - id: city
+        label: "Ville"
       - id: siret
         label: "Numéro de SIRET"
       - id: commitmentDuration
@@ -153,6 +150,7 @@ formulas:
         type: textarea
         placeholder: "Décrivez votre projet"
         required: false
+
 defaultFormula: cpro
 submitLabel: "Envoyer"
 successMessage: "Merci pour votre message ! Nous revenons vers vous rapidement."

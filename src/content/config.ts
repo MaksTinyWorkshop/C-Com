@@ -128,9 +128,12 @@ const contactFormFieldSchema = z.object({
       z.object({
         label: z.string(),
         value: z.string(),
+        submissionValue: z.string().optional(),
       }),
     )
     .optional(),
+  submissionName: z.string().optional(),
+  submissionValue: z.string().optional(),
 });
 
 const contactFormFormulaSchema = z.object({
@@ -138,6 +141,8 @@ const contactFormFormulaSchema = z.object({
   label: z.string(),
   description: z.string().optional(),
   helper: z.string().optional(),
+  submissionName: z.string().optional(),
+  submissionValue: z.string().optional(),
   fields: z.array(contactFormFieldSchema).min(1),
   submitLabel: z.string().optional(),
 });
