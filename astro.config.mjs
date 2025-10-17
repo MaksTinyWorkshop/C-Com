@@ -1,6 +1,7 @@
-import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
+import tailwind from "@astrojs/tailwind";
+import { defineConfig } from "astro/config";
+import node from "@astrojs/node";
 import { webcore } from "webcoreui/integration";
 import { rehypeBaseImages } from "./src/lib/rehypeBaseImages";
 
@@ -12,7 +13,10 @@ export default defineConfig({
 
   scopedStyleStrategy: "where",
   integrations: [tailwind(), mdx(), webcore()],
-  output: 'static',
+  output: "server",
+  adapter: node({
+    mode: "standalone", // indispensable pour le déploiement
+  }),
   base: siteBase,
   markdown: {
     syntaxHighlight: "prism",

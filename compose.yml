@@ -1,0 +1,9 @@
+services:
+  ccom:
+    build: .
+    container_name: ccom-app
+    restart: always
+    ports:
+      - "4321:4321"
+    env_file:
+      - .env.production
