@@ -17,8 +17,13 @@ const clampNumeric = (value: number, min: number, max: number | null) => {
   return Math.min(Math.max(value, min), upper);
 };
 
-const syncNumberField = (container: HTMLElement, rawValue: string | number | null | undefined) => {
-  const input = container.querySelector<HTMLInputElement>('input[type="number"]');
+const syncNumberField = (
+  container: HTMLElement,
+  rawValue: string | number | null | undefined
+) => {
+  const input = container.querySelector<HTMLInputElement>(
+    'input[type="number"]'
+  );
   if (!input) return null;
 
   const min = toFiniteOrNull(container.dataset.min ?? input.min) ?? 0;
@@ -33,37 +38,43 @@ const syncNumberField = (container: HTMLElement, rawValue: string | number | nul
   input.value = nextValue === null ? "" : String(nextValue);
   container.dataset.value = input.value;
 
-  container.querySelector<HTMLButtonElement>("[data-stepper-decrement]")!.disabled =
-    nextValue === null ? true : nextValue <= min;
+  container.querySelector<HTMLButtonElement>(
+    "[data-stepper-decrement]"
+  )!.disabled = nextValue === null ? true : nextValue <= min;
 
-  const increment = container.querySelector<HTMLButtonElement>("[data-stepper-increment]");
+  const increment = container.querySelector<HTMLButtonElement>(
+    "[data-stepper-increment]"
+  );
   if (increment)
-    increment.disabled = max !== null && nextValue !== null ? nextValue >= max : false;
+    increment.disabled =
+      max !== null && nextValue !== null ? nextValue >= max : false;
 
   return { input, min, max, step, value: nextValue };
 };
 
 export const initialiseNumberField = (container: HTMLElement) => {
   if (container.dataset.numberFieldInitialised === "true") return;
-  const input = container.querySelector<HTMLInputElement>('input[type="number"]');
+  const input = container.querySelector<HTMLInputElement>(
+    'input[type="number"]'
+  );
   if (!input) return;
   syncNumberField(container, input.value);
   container
     .querySelector("[data-stepper-decrement]")
     ?.addEventListener("click", () =>
-      syncNumberField(container, Number(input.value) - 1),
+      syncNumberField(container, Number(input.value) - 1)
     );
   container
     .querySelector("[data-stepper-increment]")
     ?.addEventListener("click", () =>
-      syncNumberField(container, Number(input.value) + 1),
+      syncNumberField(container, Number(input.value) + 1)
     );
   container.dataset.numberFieldInitialised = "true";
 };
 
-/* ============================================================
-   🧠 NOUVELLE PARTIE : Initialisation “intelligente” du formulaire
-   ============================================================ */
+/* =============================================================
+NOUVELLE PARTIE : Initialisation “intelligente” du formulaire
+============================================================== */
 
 const normalise = (value: string | null | undefined) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -81,11 +92,13 @@ const parseCountParam = (params: URLSearchParams, ...names: string[]) => {
 const activateFormula = (
   forms: HTMLFormElement[],
   select: HTMLSelectElement | null,
-  requestedId: string | null,
+  requestedId: string | null
 ) => {
   const normalisedRequested = normalise(requestedId);
   const targetForm =
-    forms.find((f) => normalise(f.dataset.formula) === normalisedRequested) ?? forms[0] ?? null;
+    forms.find((f) => normalise(f.dataset.formula) === normalisedRequested) ??
+    forms[0] ??
+    null;
 
   if (!targetForm) return;
 
@@ -95,13 +108,18 @@ const activateFormula = (
     f.toggleAttribute("hidden", !isTarget);
   });
 
-  if (select && targetForm.dataset.formula) select.value = targetForm.dataset.formula;
+  if (select && targetForm.dataset.formula)
+    select.value = targetForm.dataset.formula;
 };
 
 export const initContactForm = (section: HTMLElement) => {
   const select = section.querySelector<HTMLSelectElement>(SELECT_SELECTOR);
-  const forms = Array.from(section.querySelectorAll<HTMLFormElement>(FORM_SELECTOR));
-  const numberFields = Array.from(section.querySelectorAll<HTMLElement>(NUMBER_FIELD_SELECTOR));
+  const forms = Array.from(
+    section.querySelectorAll<HTMLFormElement>(FORM_SELECTOR)
+  );
+  const numberFields = Array.from(
+    section.querySelectorAll<HTMLElement>(NUMBER_FIELD_SELECTOR)
+  );
 
   if (forms.length === 0) return;
 
@@ -116,7 +134,9 @@ export const initContactForm = (section: HTMLElement) => {
   // 🧩 Appliquer les valeurs trouvées
   if (visualsValue) {
     forms.forEach((form) => {
-      const input = form.querySelector<HTMLInputElement>('input[name="visuals"]');
+      const input = form.querySelector<HTMLInputElement>(
+        'input[name="visuals"]'
+      );
       if (input) {
         input.value = visualsValue;
         const container = input.closest<HTMLElement>(NUMBER_FIELD_SELECTOR);
@@ -127,7 +147,9 @@ export const initContactForm = (section: HTMLElement) => {
 
   if (videosValue) {
     forms.forEach((form) => {
-      const input = form.querySelector<HTMLInputElement>('input[name="videos"]');
+      const input = form.querySelector<HTMLInputElement>(
+        'input[name="videos"]'
+      );
       if (input) {
         input.value = videosValue;
         const container = input.closest<HTMLElement>(NUMBER_FIELD_SELECTOR);
@@ -148,9 +170,9 @@ export const initContactForm = (section: HTMLElement) => {
   }
 };
 
-/* ============================================================
-   🧾 Collecte des données pour l’envoi
-   ============================================================ */
+/* ==========================================================
+Collecte des données pour l’envoi
+============================================================ */
 export const collectContactData = (form: HTMLFormElement) => {
   const formData = new FormData(form);
   const fields: Record<string, string> = {};
